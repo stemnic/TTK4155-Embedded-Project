@@ -38,11 +38,18 @@ void uart_print(const char string[]) {
 	}
 }
 
+char uart_receive_char() {
+	UCSR0B = UCSR0B & ~(1 << RXCIE0);
+	while (!(UCSR0A & (1 << RXC0))) {}
+	char dat = UDR0;
+	UCSR0B = UCSR0B | (1 << RXCIE0);
+	return dat;
+}
+
 int uart_receive(char* buff, uint16_t maxLen) {
 	int cnt = 0;
 	if (bufferHead == bufferTail) return 0;
-	do
-	{
+	do {
 		buff[cnt] = buffer[bufferHead];
 		cnt++;
 		bufferHead = (bufferHead + 1) % bufferLen;

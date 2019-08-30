@@ -25,4 +25,6 @@ void uart_print(const char string[]);
 // Dequeue the last received 
 int uart_receive(char* buff, uint16_t maxLen);
 
+char uart_receive_char();
+
 #endif /* UART_H_ */
