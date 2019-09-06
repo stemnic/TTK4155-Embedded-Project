@@ -23,14 +23,16 @@ int main(void)
 	char recBuffer[128];
 	/* Replace with your application code */
 	for (;;) {
-		//gets(recBuffer);
-		//printf(recBuffer);
+		gets(recBuffer);
+		printf(recBuffer);
+		/* Does not work somehow
 		if (uart_receive(recBuffer, 128)) {
 			// uart_print(recBuffer);
 			printf(recBuffer);
 			printf("Got some stuff yo\n");
-		}
-		_delay_ms(1000);
+		} 
+		*/
+		//_delay_ms(1000);
 	}
 }
 
