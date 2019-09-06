@@ -25,6 +25,8 @@ void uart_init(char* _buffer, uint16_t len) {
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
 	/* Set frame format: 8data, 1stop bit */
 	UCSR0C = (1<<URSEL0)|(3<<UCSZ00);
+	fdevopen(uart_transmit, uart_receive_char);
+	sei();
 }
 
 void uart_transmit(unsigned char data) {
@@ -48,12 +50,16 @@ char uart_receive_char() {
 
 int uart_receive(char* buff, uint16_t maxLen) {
 	int cnt = 0;
+	char last = '\0';
 	if (bufferHead == bufferTail) return 0;
 	do {
-		buff[cnt] = buffer[bufferHead];
-		cnt++;
-		bufferHead = (bufferHead + 1) % bufferLen;
-	} while (bufferHead != bufferTail && buff[cnt-1] != '\0' && cnt < maxLen);
+		if (bufferHead != bufferTail) {
+			last = buffer[bufferHead];
+			buff[cnt] = last;
+			cnt++;
+			bufferHead = (bufferHead + 1) % bufferLen;
+		}
+	} while (last != '\0' && cnt < maxLen);
 	buff[maxLen - 1] = '\0';
 	return cnt;
 }
