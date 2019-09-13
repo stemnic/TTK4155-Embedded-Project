@@ -19,9 +19,15 @@
 #define ADC_CH3 6
 #define ADC_CH4 7
 
+#define JOYSTICK_X 0
+#define JOYSTICK_Y 1
+#define SLIDER_1 0
+#define SLIDER_2 1
+
 void ADC_init();
-void getJoystickPositions(int8_t* x_value, int8_t* y_value);
-void getSliderValues(uint8_t *slider_1, uint8_t *slider_2);
+
+int8_t getJoystickValue(int value);
+uint8_t getSliderValue(int value);
 
 
 

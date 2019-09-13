@@ -10,7 +10,7 @@
 #include "sram.h"
 
 void SRAM_init(){
-	printf("Enableing EXTMEM");
+	printf("Enabling EXTMEM\n");
 	MCUCR |= (1<<SRE); //Enable EXTMEM
 	SFIOR |= (1<<XMM2);
 	

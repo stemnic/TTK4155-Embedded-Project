@@ -21,3 +21,8 @@ uint8_t sliderButton2_Read(){
 	unsigned char i = PINB;
 	return (uint8_t) (i >> 2) & 1;
 }
+
+uint8_t getButton(int button) {
+	uint8_t i = PINB;
+	return (i >> button) & 1;
+}

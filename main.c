@@ -12,6 +12,7 @@
 #include "io.h"
 #include "sram.h"
 #include "adc.h"
+#include "oled.h"
 
 #define BUFFER_LEN 128
 
@@ -43,25 +44,29 @@ void exercise2() {
 }
 
 void exercise3(){
-	int8_t xVal;
-	int8_t yVal;
-	uint8_t slider_1;
-	uint8_t slider_2;
-	uint8_t joystickButton = 0;
-	uint8_t touch1Button = 0;
-	uint8_t touch2Button = 0;
 	for (;;)
 	{
-		getJoystickPositions(&xVal, &yVal);
+		int8_t xVal = getJoystickValue(JOYSTICK_X);
+		int8_t yVal = getJoystickValue(JOYSTICK_Y);
 		printf("Joystick: (%i, %i)\n", xVal, yVal);
-		getSliderValues(&slider_1, &slider_2);
+		uint8_t slider_1 = getSliderValue(SLIDER_1);
+		uint8_t slider_2 = getSliderValue(SLIDER_2);
 		printf("Sliders: %i and %i\n", slider_1, slider_2);
-		joystickButton = joystickButton_Read();
-		touch1Button = sliderButton1_Read();
-		touch2Button = sliderButton2_Read();
-		printf("touch(%i, %i)\n", touch1Button, touch2Button);
+		uint8_t button1 = getButton(BUTTON_1);
+		uint8_t button2 = getButton(BUTTON_2);
+		printf("touch(%i, %i)\n", button1, button2);
 
 		_delay_ms(200);
+	}
+}
+
+void exercise4(){
+	oled_init();
+	oled_Clear();
+	for (;;)
+	{
+		oled_write_string("Hello World!\n", FONT8x8);
+		_delay_ms(1000);
 	}
 }
 
@@ -74,7 +79,8 @@ int main(void)
 	SRAM_test();
 	ADC_init();
 	
-	exercise3();
+	exercise4();
+	//exercise3();
 	//exercise2();
 	//exercise1v2();
 }

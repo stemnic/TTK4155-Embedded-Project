@@ -12,6 +12,39 @@ uint8_t adcBuffer = 0;
 int16_t xMean;
 int16_t yMean;
 
+volatile char *ext_adc = (char *) 0x1400;
+
+int8_t getJoystickValueInternal(int value, int raw) {
+	ext_adc[0] = value == JOYSTICK_X ? ADC_CH1 : ADC_CH2;
+	waitingForADC = 1;
+	
+	while (waitingForADC) _delay_us(1);
+	
+	if (raw) return adcBuffer;
+	
+	int16_t tempValue = adcBuffer - (value == JOYSTICK_X ? xMean : yMean);
+	if (tempValue > 127) tempValue = 127;
+	if (tempValue < -127) tempValue = -127;
+	if (tempValue < 2 && tempValue > -2) tempValue = 0;
+	return (int8_t)tempValue;
+}
+
+int8_t getJoystickValue(int value) {
+	return getJoystickValueInternal(value, 0);
+}
+
+void calJoystick(){
+	int xtotal = 0;
+	int ytotal = 0;
+	for (int i = 0; i < 100; i++) {
+		xtotal += (uint8_t)getJoystickValueInternal(JOYSTICK_X, 1);
+		ytotal += (uint8_t)getJoystickValueInternal(JOYSTICK_Y, 1);
+	}
+
+	xMean = xtotal / 100;
+	yMean = ytotal / 100;
+}
+
 void ADC_init(){
 	//Enables interrupt on falling flank on INT
 	MCUCR |= (ISC10 << 0);
@@ -20,77 +53,16 @@ void ADC_init(){
 	calJoystick();
 }
 
-void calJoystick(){
-	uint8_t xdata;
-	uint8_t ydata;
-	int xtotal = 0;
-	int ytotal = 0;
-	for (int i = 0; i < 100; i++) {
-		readJoystick(&xdata, &ydata);
-		xtotal += xdata;
-		ytotal += ydata;
-	}
-
-	xMean = xtotal / 100;
-	yMean = ytotal / 100;
-}
-
-void getJoystickPositions(int8_t* x_value, int8_t* y_value) {
-	uint8_t rawX;
-	uint8_t rawY;
-	readJoystick(&rawX, &rawY);
-	int16_t tempX = rawX - xMean;
-	int16_t tempY = rawY - yMean;
-	if (tempX > 127) tempX = 127;
-	if (tempX < -127) tempX = -127;
-	if (tempY > 127) tempY = 127;
-	if (tempY < -127) tempY = -127;
-	if (tempX < 2 && tempX > -2) tempX = 0;
-	if (tempY < 2 && tempY > -2) tempY = 0;
-	*x_value = (int8_t) tempX;
-	*y_value = (int8_t) tempY;
-}
-
-void readJoystick(uint8_t* x_value, uint8_t* y_value) {
-	volatile char *ext_adc = (char *) 0x1400;
-	//makes the adc read CH1 (x axis)
-	ext_adc[0] = ADC_CH1;
+uint8_t getSliderValue(int value) {
+	ext_adc[0] = value == SLIDER_1 ? ADC_CH3 : ADC_CH4;
 	waitingForADC = 1;
-	while (waitingForADC)
-	{
-		//Dirty hack for wating for joystick values
-		_delay_us(1);
-	}
-	*x_value = adcBuffer;
-	ext_adc[0] = ADC_CH2;
-	waitingForADC = 1;
-	while (waitingForADC)
-	{
-		//Dirty hack for wating for joystick values
-		_delay_us(1);
-	}
-	*y_value = adcBuffer;
-}
+	
+	while (waitingForADC) _delay_us(1);
 
-void getSliderValues(uint8_t *slider_1, uint8_t *slider_2) {
-	volatile char *ext_adc = (char *) 0x1400;
-	ext_adc[0] = ADC_CH3;
-	waitingForADC = 1;
-	while (waitingForADC) {
-		_delay_us(1);
-	}
-	*slider_1 = adcBuffer;
-
-	ext_adc[0] = ADC_CH4;
-	waitingForADC = 1;
-	while (waitingForADC) {
-		_delay_us(1);
-	}
-	*slider_2 = adcBuffer;
+	return adcBuffer;
 }
 
 ISR (INT0_vect){
-	volatile char *ext_adc = (char *) 0x1400;
 	uint8_t adc_value = ext_adc[0];
 	waitingForADC = 0;
 	adcBuffer = adc_value;
