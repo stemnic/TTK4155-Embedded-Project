@@ -7,11 +7,17 @@
 
 #include "io.h"
 
-void SRAM_init(){
-	printf("Enableing EXTMEM");
-	MCUCR |= (1<<SRE); //Enable EXTMEM
-	SFIOR |= (1<<XMM2);
-	
-	//SFIOR |= (1<<XMBK); //Enable BusKeep
+uint8_t joystickButton_Read(){
+	unsigned char i = PINB;
+	return (uint8_t) (i >> 0) & 1;
+}
 
+uint8_t sliderButton1_Read(){
+	unsigned char i = PINB;
+	return (uint8_t) (i >> 1) & 1;
+}
+
+uint8_t sliderButton2_Read(){
+	unsigned char i = PINB;
+	return (uint8_t) (i >> 2) & 1;
 }

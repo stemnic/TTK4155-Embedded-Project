@@ -14,6 +14,7 @@
 #include <avr/interrupt.h>
 
 void SRAM_test(void);
+void SRAM_init();
 
 
 #endif /* SRAM_H_ */

@@ -9,6 +9,15 @@
 #include <stdlib.h>
 #include "sram.h"
 
+void SRAM_init(){
+	printf("Enableing EXTMEM");
+	MCUCR |= (1<<SRE); //Enable EXTMEM
+	SFIOR |= (1<<XMM2);
+	
+	//SFIOR |= (1<<XMBK); //Enable BusKeep
+
+}
+
 void SRAM_test(void){
 	volatile char *ext_ram = (char *) 0x1800; 
 	// Start address for the SRAM

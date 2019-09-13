@@ -54,13 +54,13 @@ int uart_receive(char* buff, uint16_t maxLen) {
 	if (bufferHead == bufferTail) return 0;
 	do {
 		if (bufferHead != bufferTail) {
-			last = buffer[bufferHead];
-			buff[cnt] = last;
-			cnt++;
-			bufferHead = (bufferHead + 1) % bufferLen;
+		last = buffer[bufferHead];
+		buff[cnt] = last;
+		cnt++;
+		bufferHead = (bufferHead + 1) % bufferLen;
 		}
 	} while (last != '\0' && cnt < maxLen);
-	buff[maxLen - 1] = '\0';
+	//buff[maxLen - 1] = '\0';
 	return cnt;
 }
 
