@@ -14,6 +14,7 @@
 #include "sram.h"
 #include "adc.h"
 #include "oled.h"
+#include "oled_buffer.h"
 
 #define BUFFER_LEN 128
 
@@ -61,7 +62,7 @@ void exercise3(){
 	}
 }
 
-void exercise4(){
+void exercise4_1(){
 	
 	for (;;)
 	{
@@ -71,6 +72,17 @@ void exercise4(){
 	}
 }
 
+void exercise4_2(){
+	wipe_buffer();
+	wipe_buffer();
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 8; j++) {
+			draw_block_at(i, j, OLED_ADDR_OVERWRITE);
+		}
+	}
+	draw_string_at(1, 12, "Hello", FONT5x7, OLED_ADDR_INVERT);
+	flush_buffer();
+}
 
 int main(void)
 {
@@ -84,7 +96,7 @@ int main(void)
 	ADC_init();
 	oled_init();
 	
-	exercise4();
+	exercise4_2();
 	//exercise3();
 	//exercise2();
 	//exercise1v2();

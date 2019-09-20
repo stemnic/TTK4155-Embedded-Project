@@ -21,9 +21,13 @@ void wipe_buffer();
 
 void flush_buffer();
 
+//64x128 
 void draw_point_at(uint8_t row, uint8_t col, uint8_t addressingMode);
+//8x128
 void draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8_t addressingMode);
+//8x12
 void draw_block_at(uint8_t row, uint8_t col, uint8_t addressingMode);
+//8x128
 void draw_data_at(uint8_t row, uint8_t col, uint8_t data, uint8_t addressingMode);
 
 
