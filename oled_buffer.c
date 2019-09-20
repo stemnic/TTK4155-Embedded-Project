@@ -19,7 +19,7 @@ void wipe_buffer() {
 
 void flush_buffer() {
 	for (uint8_t i = 0; i < 8; i++) {
-		oled_Command(PAGE_START_ADDR_PAGE_BASE + i);
+		oled_command(PAGE_START_ADDR_PAGE_BASE + i);
 		for (uint8_t j = 0; j < 128; j++) {
 			oled_write_byte(ext_ram[i + (j << 3)]);
 		}

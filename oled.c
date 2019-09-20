@@ -16,42 +16,42 @@ void oled_write(char chr){
 	oled_write_string(&chr, FONT8x8);
 }
 
-void oled_Command(uint8_t command){
+void oled_command(uint8_t command){
 	oled_cmd[0] = command;
 }
 
 void oled_init(){
-	oled_Command(DISPLAY_OFF);
+	oled_command(DISPLAY_OFF);
 	
-	oled_Command(MEMORY_ADDR_MODE);
-	oled_Command(MEMORY_ADDR_MODE_PAGE);
+	oled_command(MEMORY_ADDR_MODE);
+	oled_command(MEMORY_ADDR_MODE_PAGE);
 	
-	oled_Command(SEGMENT_REMAP);
-	oled_Command(COM_REVERSE_SCAN_DIR);
-	oled_Command(SCROLL_DISABLE);
+	oled_command(SEGMENT_REMAP);
+	oled_command(COM_REVERSE_SCAN_DIR);
+	oled_command(SCROLL_DISABLE);
 	
-	oled_Command(PAGE_START_ADDR_PAGE_BASE);
-	oled_Command(PAGE_LOW_COL_START);
-	oled_Command(PAGE_HIGH_COL_START);
+	oled_command(PAGE_START_ADDR_PAGE_BASE);
+	oled_command(PAGE_LOW_COL_START);
+	oled_command(PAGE_HIGH_COL_START);
 	
-	oled_Command(DISPLAY_ON);
+	oled_command(DISPLAY_ON);
 	
-	oled_Clear();
+	oled_clear();
 }
 
 int currentPage = 0;
 int currentCol = 0;
 
-void oled_Clear(){
+void oled_clear(){
 	for (int page = 0; page < 8; page++)
 	{
-		oled_Command(PAGE_START_ADDR_PAGE_BASE + page);
+		oled_command(PAGE_START_ADDR_PAGE_BASE + page);
 		for (int col = 0; col < 128; col++)
 		{
 			oled_data[0] = 0x00;
 		}
 	}
-	oled_Command(PAGE_START_ADDR_PAGE_BASE);
+	oled_command(PAGE_START_ADDR_PAGE_BASE);
 	currentPage = 0;
 	currentCol = 0;
 }
@@ -66,7 +66,7 @@ void oled_write_char_internal (char chr, int fontSize){
 				oled_data[0] = 0x00;
 			}
 		}
-		oled_Command(PAGE_START_ADDR_PAGE_BASE + currentPage);
+		oled_command(PAGE_START_ADDR_PAGE_BASE + currentPage);
 		currentCol = 0;
 		//oled_Command(RESET_PAGE_COLUMN);
 		return;
@@ -74,7 +74,7 @@ void oled_write_char_internal (char chr, int fontSize){
 		if (++currentPage > 7){
 			currentPage = 0;
 		}
-		oled_Command(PAGE_START_ADDR_PAGE_BASE + currentPage);
+		oled_command(PAGE_START_ADDR_PAGE_BASE + currentPage);
 		currentCol = 0;
 	}
 	for (int col=0; col < fontSize; col++){
@@ -110,7 +110,7 @@ void oled_write_string (char *chr_ptr, int fontSize){
 					oled_data[0] = 0x00;
 				}
 			}
-			oled_Command(PAGE_START_ADDR_PAGE_BASE + currentPage);
+			oled_command(PAGE_START_ADDR_PAGE_BASE + currentPage);
 			currentCol = 0;
 			//oled_Command(RESET_PAGE_COLUMN);
 			continue;
