@@ -26,3 +26,9 @@ uint8_t getButton(int button) {
 	uint8_t i = PINB;
 	return (i >> button) & 1;
 }
+
+void getControllerButtons(controllerInput *controllerBuffer){
+	controllerBuffer->joystick_button = joystickButton_Read();
+	controllerBuffer->slider_one_button = sliderButton1_Read();
+	controllerBuffer->slider_two_button = sliderButton2_Read();
+}

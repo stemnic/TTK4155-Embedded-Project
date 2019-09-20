@@ -14,7 +14,7 @@ uint8_t listLen = 0;
 
 void ui_list_select(int row) {
 	for (int j = 0; j < 12; j++) {
-		invert_block_at(row, j)
+		invert_block_at(row, j);
 	}
 }
 

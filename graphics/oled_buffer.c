@@ -70,7 +70,7 @@ void draw_char_at(uint8_t row, uint8_t col, char towrite, uint8_t fontSize, uint
 	}
 }
 
-uint8_t draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8_t addressingMode) {
+void draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8_t addressingMode) {
 	uint8_t i = 0;
 	for (i = 0; str[i] != '\0'; i++) {
 		draw_char_at(row, col + i*fontSize, str[i], fontSize, addressingMode);

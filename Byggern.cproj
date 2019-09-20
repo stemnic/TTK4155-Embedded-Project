@@ -176,6 +176,12 @@
     <Compile Include="graphics\oled_buffer.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="graphics\ui.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="graphics\ui.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
