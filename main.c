@@ -86,6 +86,24 @@ void exercise4_2(){
 	flush_buffer();
 }
 
+void process_cycle_clock_init(){
+	TCCR0 |= (0b100 << 0); // clk/256 will interrupt at an interval of 13ms
+	TIMSK |= (1 << 1); // Overflow interrupt enable
+}
+
+controllerInput input;
+uint8_t adc_read = 0;
+
+ISR (TIMER0_OVF_vect){
+	flush_buffer();
+	getControllerButtons(&input);
+	adc_read = 1;
+}
+
+void process_cycle(){
+	
+}
+
 int main(void)
 {
 	char buffer[BUFFER_LEN];
@@ -98,7 +116,21 @@ int main(void)
 	ADC_init();
 	oled_init();
 	
-	exercise4_2();
+	process_cycle_clock_init();
+	
+	//exercise4_2();
+	
+	while (1){
+		if (adc_read){
+			//Can't be called as an interrupt
+			input.joystick_x = getJoystickValue(JOYSTICK_X);
+			input.joystick_y = getJoystickValue(JOYSTICK_Y);
+			input.slider_one_value = getSliderValue(SLIDER_1);
+			input.slider_two_value = getSliderValue(SLIDER_2);
+			adc_read = 0;
+		}
+	}
+	
 	//exercise3();
 	//exercise2();
 	//exercise1v2();
