@@ -71,11 +71,11 @@ void draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8
 }
 
 void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode) {
-	uint8_t dx = abs(((int16_t)x1) - ((int16_t)x0));
-	uint8_t dy = abs(((int16_t)y1) - ((int16_t)y0));
-	uint8_t err = dx+dy;
-	int8_t sx = x0 < x1 ? 1 : -1;
-	int8_t sy = y0 < y1 ? 1 : -1;
+	int16_t dx = abs(((int16_t)x1) - ((int16_t)x0));
+	int16_t dy = -abs(((int16_t)y1) - ((int16_t)y0));
+	int16_t err = dx+dy;
+	int16_t sx = x0 < x1 ? 1 : -1;
+	int16_t sy = y0 < y1 ? 1 : -1;
 	while (1) {
 		draw_point_at(x0, y0, addressingMode);
 		if (x0 == x1 && y0 == y1) break;

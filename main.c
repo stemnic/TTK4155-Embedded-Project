@@ -82,6 +82,7 @@ void exercise4_2(){
 		}
 	}
 	draw_string_at(1, 12, "Hello", FONT5x7, OLED_ADDR_INVERT);
+	draw_line(0, 0, 64, 128, OLED_ADDR_LAYER);
 	flush_buffer();
 }
 
