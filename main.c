@@ -97,8 +97,6 @@ controllerInput input;
 uint8_t adc_read = 0;
 
 ISR (TIMER0_OVF_vect){
-	flush_buffer();
-	getControllerButtons(&input);
 	adc_read = 1;
 }
 
@@ -134,6 +132,7 @@ int main(void)
 	uint8_t jbutton;
 	while (1){
 		if (adc_read){
+			getControllerButtons(&input);
 			//Can't be called as an interrupt
 			
 			input.joystick_x = getJoystickValue(JOYSTICK_X);
@@ -167,6 +166,7 @@ int main(void)
 			jbutton = input.joystick_button;
 			
 			adc_read = 0;
+			flush_buffer();
 		}
 		_delay_ms(1);
 	}
