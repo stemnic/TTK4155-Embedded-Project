@@ -6,7 +6,7 @@
  */ 
 
 #include "oled_buffer.h"
-
+#include <stdlib.h>
 volatile char* ext_ram = (char *) 0x1800;
 
 void wipe_buffer() {
@@ -46,11 +46,15 @@ void draw_point_at(uint8_t row, uint8_t col, uint8_t addressingMode) {
 	draw_data_at(irow, icol, 1 << offset, addressingMode);
 }
 
-
+void invert_block_at(uint8_t row, uint8_t col) {
+	for (int i = col*8; i < col*8 + 8; i++) {
+		draw_data_at(row, i, ~ext_ram[row + i * 8], OLED_ADDR_OVERWRITE);
+	}
+}
 
 void draw_block_at(uint8_t row, uint8_t col, uint8_t addressingMode) {
 	for (int i = col*8; i < col*8 + 8; i++) {
-		draw_data_at(row, i, (addressingMode == OLED_ADDR_INVERT) ? 0x00 : 0xFF, addressingMode);
+		draw_data_at(row, i, 0xFF, addressingMode);
 	}
 }
 
@@ -63,5 +67,21 @@ void draw_char_at(uint8_t row, uint8_t col, char towrite, uint8_t fontSize, uint
 void draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8_t addressingMode) {
 	for (int i = 0; str[i] != '\0'; i++) {
 		draw_char_at(row, col + i*fontSize, str[i], fontSize, addressingMode);
+	}
+}
+
+void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode) {
+	float dx = x1-x0;
+	float dy = y1-y0;
+	float derr = abs(dy / dx);
+	float err = 0;
+	uint8_t y = y0;
+	for (int x = x0; x < x1; x++) {
+		draw_point_at(x, y, addressingMode);
+		err += derr;
+		if (err > 0.5f) {
+			y += dy < 0 ? -1 : 1;
+			err -= 1.0f;
+		}
 	}
 }
