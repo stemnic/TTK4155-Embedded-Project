@@ -50,7 +50,8 @@ void exercise3(){
 	{
 		int8_t xVal = getJoystickValue(JOYSTICK_X);
 		int8_t yVal = getJoystickValue(JOYSTICK_Y);
-		printf("Joystick: (%i, %i)\n", xVal, yVal);
+		int8_t btnVal = joystickButton_Read();
+		printf("Joystick: (%i, %i) (%i)\n", xVal, yVal, btnVal);
 		uint8_t slider_1 = getSliderValue(SLIDER_1);
 		uint8_t slider_2 = getSliderValue(SLIDER_2);
 		printf("Sliders: %i and %i\n", slider_1, slider_2);
