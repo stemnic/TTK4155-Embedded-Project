@@ -11,6 +11,7 @@
 
 #include <avr/io.h>
 
+
 #define DISPLAY_OFF 0xae
 #define DISPLAY_ON 0xaf
 #define MEMORY_ADDR_MODE 0x20
@@ -33,6 +34,9 @@ void oled_init();
 void oled_Clear();
 void oled_write_string (char *chr_ptr, int fontSize);
 void oled_write_char (char chr);
+void oled_Command(uint8_t command);
+void oled_write_byte(uint8_t data);
+uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize);
 
 
 

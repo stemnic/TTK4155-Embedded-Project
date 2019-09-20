@@ -8,6 +8,7 @@
 #include "oled.h"
 #include "fonts.h"
 
+
 volatile char *oled_cmd = (char *) 0x1000;
 volatile char *oled_data = (char *) 0x1200;
 
@@ -115,21 +116,29 @@ void oled_write_string (char *chr_ptr, int fontSize){
 			continue;
 		}
 		for (int col=0; col < fontSize; col++){
-			switch(fontSize) {
-				case FONT8x8:
-					oled_data[0] =  pgm_read_byte(&(font8[chr_ptr[num]-32][col]));
-					break;
-				case FONT5x7:
-					oled_data[0] =  pgm_read_byte(&(font5[chr_ptr[num]-32][col]));
-					break;
-				case FONT4x6:
-					oled_data[0] =  pgm_read_byte(&(font4[chr_ptr[num]-32][col]));
-					break;
-				default:
-					return;
-			}
+			oled_data[0] = get_font_byte(chr_ptr[num], col, fontSize);
 			currentCol++;
 		}
 	}
+}
 
+uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize) {
+	switch (fontSize) {
+		case FONT8x8:
+			return pgm_read_byte(&(font8[in - 32][col]));
+		case FONT5x7:
+			return pgm_read_byte(&(font5[in - 32][col]));
+		case FONT4x6:
+			return pgm_read_byte(&(font4[in - 32][col]));
+		default:
+			return 0;
+	}
+}
+
+void oled_Command(uint8_t command){
+	oled_cmd[0] = command;
+}
+
+void oled_write_byte(uint8_t data) {
+	oled_data[0] = data;
 }

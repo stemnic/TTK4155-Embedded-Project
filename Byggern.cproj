@@ -161,6 +161,12 @@
     <Compile Include="oled.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="oled_buffer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="oled_buffer.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="sram.c">
       <SubType>compile</SubType>
     </Compile>
