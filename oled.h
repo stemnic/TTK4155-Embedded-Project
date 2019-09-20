@@ -21,6 +21,8 @@
 #define COM_REVERSE_SCAN_DIR 0xc8
 #define PAGE_LOW_COL_START 0x00
 #define PAGE_HIGH_COL_START 0x10
+#define SCROLL_DISABLE 0x2e
+#define SCROLL_ENABLE 0x2f
 
 #define FONT8x8 8
 #define FONT5x7 5

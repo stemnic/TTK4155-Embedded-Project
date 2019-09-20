@@ -23,6 +23,7 @@ void oled_init(){
 	
 	oled_Command(SEGMENT_REMAP);
 	oled_Command(COM_REVERSE_SCAN_DIR);
+	oled_Command(SCROLL_DISABLE);
 	
 	oled_Command(PAGE_START_ADDR_PAGE_BASE);
 	oled_Command(PAGE_LOW_COL_START);
