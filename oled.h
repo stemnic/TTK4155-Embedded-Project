@@ -19,6 +19,8 @@
 #define PAGE_START_ADDR_PAGE_BASE 0xb0
 #define RESET_PAGE_COLUMN 0x00
 #define COM_REVERSE_SCAN_DIR 0xc8
+#define PAGE_LOW_COL_START 0x00
+#define PAGE_HIGH_COL_START 0x10
 
 #define FONT8x8 8
 #define FONT5x7 5
@@ -28,6 +30,7 @@
 void oled_init();
 void oled_Clear();
 void oled_write_string (char *chr_ptr, int fontSize);
+void oled_write_char (char chr);
 
 
 

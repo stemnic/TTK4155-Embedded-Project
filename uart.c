@@ -25,7 +25,6 @@ void uart_init(char* _buffer, uint16_t len) {
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
 	/* Set frame format: 8data, 1stop bit */
 	UCSR0C = (1<<URSEL0)|(3<<UCSZ00);
-	fdevopen(uart_transmit, uart_receive_char);
 	sei();
 }
 

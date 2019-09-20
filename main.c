@@ -6,6 +6,7 @@
  */ 
 
 #define F_CPU 4915200
+
 #include <avr/io.h>
 #include <stdio.h>
 #include "uart.h"
@@ -61,11 +62,11 @@ void exercise3(){
 }
 
 void exercise4(){
-	oled_init();
-	oled_Clear();
+	
 	for (;;)
 	{
-		oled_write_string("Hello World!\n", FONT8x8);
+		//printf("Hello World\n");
+		oled_write_string("Hello World\n", FONT8x8);
 		_delay_ms(1000);
 	}
 }
@@ -75,9 +76,13 @@ int main(void)
 {
 	char buffer[BUFFER_LEN];
 	uart_init(buffer, BUFFER_LEN);
+	fdevopen(uart_transmit, uart_receive_char);
+	//fdevopen(oled_write_char,uart_receive_char);
+	
 	SRAM_init();
 	SRAM_test();
 	ADC_init();
+	oled_init();
 	
 	exercise4();
 	//exercise3();

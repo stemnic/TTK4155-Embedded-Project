@@ -11,6 +11,10 @@
 volatile char *oled_cmd = (char *) 0x1000;
 volatile char *oled_data = (char *) 0x1200;
 
+void oled_write(unsigned char chr){
+	oled_write_string(&chr, FONT8x8);
+}
+
 void oled_init(){
 	oled_Command(DISPLAY_OFF);
 	
@@ -21,10 +25,16 @@ void oled_init(){
 	oled_Command(COM_REVERSE_SCAN_DIR);
 	
 	oled_Command(PAGE_START_ADDR_PAGE_BASE);
+	oled_Command(PAGE_LOW_COL_START);
+	oled_Command(PAGE_HIGH_COL_START);
 	
 	oled_Command(DISPLAY_ON);
-
+	
+	oled_Clear();
 }
+
+int currentPage = 0;
+int currentCol = 0;
 
 void oled_Clear(){
 	for (int page = 0; page < 8; page++)
@@ -36,10 +46,52 @@ void oled_Clear(){
 		}
 	}
 	oled_Command(PAGE_START_ADDR_PAGE_BASE);
+	currentPage = 0;
+	currentCol = 0;
 }
 
-int currentPage = 0;
-int currentCol = 0;
+void oled_write_char_internal (char chr, int fontSize){
+	if (chr == '\n') {
+		if (++currentPage > 7){
+			currentPage = 0;
+		}
+		if (currentCol < 128) {
+			for (;currentCol < 128; currentCol++) {
+				oled_data[0] = 0x00;
+			}
+		}
+		oled_Command(PAGE_START_ADDR_PAGE_BASE + currentPage);
+		currentCol = 0;
+		//oled_Command(RESET_PAGE_COLUMN);
+		return;
+	}else if(currentCol == 128) {
+		if (++currentPage > 7){
+			currentPage = 0;
+		}
+		oled_Command(PAGE_START_ADDR_PAGE_BASE + currentPage);
+		currentCol = 0;
+	}
+	for (int col=0; col < fontSize; col++){
+		switch(fontSize) {
+			case FONT8x8:
+			oled_data[0] =  pgm_read_byte(&(font8[chr-32][col]));
+			break;
+			case FONT5x7:
+			oled_data[0] =  pgm_read_byte(&(font5[chr-32][col]));
+			break;
+			case FONT4x6:
+			oled_data[0] =  pgm_read_byte(&(font4[chr-32][col]));
+			break;
+			default:
+			return;
+		}
+		currentCol++;
+	}
+}
+
+void oled_write_char (char chr){
+	oled_write_char_internal(chr, FONT8x8);
+}
 
 void oled_write_string (char *chr_ptr, int fontSize){
 	for (int num = 0; chr_ptr[num] != '\0'; num++) {
