@@ -76,7 +76,7 @@ int main(void)
 {
 	char buffer[BUFFER_LEN];
 	uart_init(buffer, BUFFER_LEN);
-	fdevopen(uart_transmit, uart_receive_char);
+	fdevopen(uart_transmit_stdio, uart_receive_char);
 	//fdevopen(oled_write_char,uart_receive_char);
 	
 	SRAM_init();

@@ -9,6 +9,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <stdio.h>
+
 #ifndef UART_H_
 #define UART_H_
 #define BAUD 9600
@@ -17,7 +19,9 @@
 void uart_init(char* _buffer, uint16_t len);
 
 // Transmit a single character over uart, busy-waiting until sent.
-void uart_transmit(unsigned char data);
+void uart_transmit(char data);
+
+int uart_transmit_stdio(char data, FILE* file);
 
 // Transmit a null-terminated string over uart, busy-waiting until sent.
 void uart_print(const char string[]);
@@ -25,6 +29,6 @@ void uart_print(const char string[]);
 // Dequeue the last received 
 int uart_receive(char* buff, uint16_t maxLen);
 
-char uart_receive_char();
+int uart_receive_char();
 
 #endif /* UART_H_ */
