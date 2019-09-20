@@ -89,5 +89,20 @@ void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressin
 			y0 += sy;
 		}
 	}
+}
 
+void draw_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t width) {
+	int8_t sx = x0 < x1 ? 1 : -1;
+	int8_t sy = y0 < y1 ? 1 : -1;
+	while (width > 0) {
+		draw_line(x0, y0, x0, y1);
+		draw_line(x0, y0, x1, y0);
+		draw_line(x0, y1, x1, y1);
+		draw_line(x1, y0, x1, y1);
+		width -= 1;
+		x0 += sx;
+		y0 += sy;
+		x1 -= sx;
+		y1 -= sy;
+	}
 }
