@@ -71,17 +71,23 @@ void draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8
 }
 
 void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode) {
-	float dx = x1-x0;
-	float dy = y1-y0;
-	float derr = abs(dy / dx);
-	float err = 0;
-	uint8_t y = y0;
-	for (int x = x0; x < x1; x++) {
-		draw_point_at(x, y, addressingMode);
-		err += derr;
-		if (err > 0.5f) {
-			y += dy < 0 ? -1 : 1;
-			err -= 1.0f;
+	uint8_t dx = abs(((int16_t)x1) - ((int16_t)x0));
+	uint8_t dy = abs(((int16_t)y1) - ((int16_t)y0));
+	uint8_t err = dx+dy;
+	int8_t sx = x0 < x1 ? 1 : -1;
+	int8_t sy = y0 < y1 ? 1 : -1;
+	while (1) {
+		draw_point_at(x0, y0, addressingMode);
+		if (x0 == x1 && y0 == y1) break;
+		int16_t e2 = err*2;
+		if (e2 >= dy) {
+			err += dy;
+			x0 += sx;
+		}
+		if (e2 <= dx) {
+			err += dx;
+			y0 += sy;
 		}
 	}
+
 }
