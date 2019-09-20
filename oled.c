@@ -135,10 +135,6 @@ uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize) {
 	}
 }
 
-void oled_Command(uint8_t command){
-	oled_cmd[0] = command;
-}
-
 void oled_write_byte(uint8_t data) {
 	oled_data[0] = data;
 }
