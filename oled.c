@@ -11,8 +11,12 @@
 volatile char *oled_cmd = (char *) 0x1000;
 volatile char *oled_data = (char *) 0x1200;
 
-void oled_write(unsigned char chr){
+void oled_write(char chr){
 	oled_write_string(&chr, FONT8x8);
+}
+
+void oled_Command(uint8_t command){
+	oled_cmd[0] = command;
 }
 
 void oled_init(){
@@ -128,8 +132,4 @@ void oled_write_string (char *chr_ptr, int fontSize){
 		}
 	}
 
-}
-
-void oled_Command(uint8_t command){
-	oled_cmd[0] = command;
 }
