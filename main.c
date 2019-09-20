@@ -15,6 +15,7 @@
 #include "drivers/adc.h"
 #include "drivers/oled.h"
 #include "graphics/oled_buffer.h"
+#include "graphics/ui.h"
 
 #define BUFFER_LEN 128
 
@@ -105,6 +106,8 @@ void process_cycle(){
 	
 }
 
+
+
 int main(void)
 {
 	char buffer[BUFFER_LEN];
@@ -117,19 +120,55 @@ int main(void)
 	ADC_init();
 	oled_init();
 	
+	wipe_buffer();
+	char * liststr[4] = { "test1", "test2", "test3", "test4" };
+	ui_list_init(liststr, 4);
+	ui_buttons_init("yes", "no");
+	
 	process_cycle_clock_init();
 	
 	//exercise4_2();
-	
+	int8_t joystick_trigger = 0;
+	uint8_t button_1;
+	uint8_t button_2;
+	uint8_t jbutton;
 	while (1){
 		if (adc_read){
 			//Can't be called as an interrupt
+			
 			input.joystick_x = getJoystickValue(JOYSTICK_X);
 			input.joystick_y = getJoystickValue(JOYSTICK_Y);
+			joystick_trigger = 0;
+			if (input.joystick_y > 40) joystick_trigger = 1;
+			if (input.joystick_y < -40) joystick_trigger = -1;
+			if (input.joystick_trigger != joystick_trigger) {
+				ui_list_update(joystick_trigger);
+			}
+			input.joystick_trigger = joystick_trigger;
+			
 			input.slider_one_value = getSliderValue(SLIDER_1);
 			input.slider_two_value = getSliderValue(SLIDER_2);
+			
+			if (input.slider_one_button != button_1) {
+				printf("Button 1 trigger\n");
+				ui_button_trigger(BUTTON_1, input.slider_one_button);
+			}
+			button_1 = input.slider_one_button;
+			
+			if (input.slider_two_button != button_2) {
+				printf("Button 2 trigger\n");
+				ui_button_trigger(BUTTON_2, input.slider_two_button);
+			}
+			button_2 = input.slider_two_button;
+			
+			if (input.joystick_button != jbutton && input.joystick_button) {
+				printf("%s\n", liststr[get_list_pos()]);
+			}
+			jbutton = input.joystick_button;
+			
 			adc_read = 0;
 		}
+		_delay_ms(1);
 	}
 	
 	//exercise3();

@@ -54,7 +54,7 @@ void draw_point_at(uint8_t row, uint8_t col, uint8_t addressingMode) {
 
 void invert_block_at(uint8_t row, uint8_t col) {
 	for (int i = col*8; i < col*8 + 8; i++) {
-		draw_data_at(row, i, ~ext_ram[row + i * 8], OLED_ADDR_OVERWRITE);
+		draw_data_at(row, i, ~ext_ram[((row << 7) + i) << 1], OLED_ADDR_OVERWRITE);
 	}
 }
 

@@ -28,25 +28,29 @@ void ui_list_init(char** options, uint8_t len) {
 }
 
 void ui_buttons_init(char* str1, char* str2) {
-	fill_box(5, 0, 7, 5, OLED_ADDR_OVERWRITE);
-	fill_box(5, 7, 7, 11, OLED_ADDR_OVERWRITE);
-	draw_string_at(6, 2, str1, FONT5x7, OLED_ADDR_INVERT);
-	draw_string_at(6, 76, str2, FONT5x7, OLED_ADDR_INVERT);
+	fill_box(5, 0, 7, 6, OLED_ADDR_OVERWRITE);
+	fill_box(5, 9, 7, 16, OLED_ADDR_OVERWRITE);
+	draw_string_at(6, 6, str1, FONT8x8, OLED_ADDR_INVERT);
+	draw_string_at(6, 80, str2, FONT8x8, OLED_ADDR_INVERT);
 }
 
 void ui_button_trigger(uint8_t button, uint8_t on) {
 	switch (button) {
 	case BUTTON_1:
-		draw_box(43, 3, 62, 54, 2, on ? OLED_ADDR_INVERT : OLED_ADDR_LAYER);
+		draw_box(41, 1, 62, 54, 2, on ? OLED_ADDR_INVERT : OLED_ADDR_LAYER);
 		break;
 	case BUTTON_2:
-		draw_box(43, 67, 62, 126, 2, on ? OLED_ADDR_INVERT : OLED_ADDR_LAYER);
+		draw_box(41, 73, 62, 126, 2, on ? OLED_ADDR_INVERT : OLED_ADDR_LAYER);
 	}
 }
 
 void ui_list_update(int8_t joystick_trigger) {
-	if (joystick_trigger != 0 && (joystick_trigger != -1 || listSel > 0) && (joystick_trigger != 1 || listSel < listLen)) {
+	if (joystick_trigger != 0 && (joystick_trigger != 1 || listSel > 0) && (joystick_trigger != -1 || listSel < listLen - 1)) {
 		ui_list_select(listSel);
-		ui_list_select(++listSel);
+		ui_list_select(listSel -= joystick_trigger);
 	}
+}
+
+uint8_t get_list_pos() {
+	return listSel;
 }

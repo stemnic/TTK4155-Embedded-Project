@@ -19,4 +19,6 @@ void ui_list_update(int8_t joystick_trigger);
 
 void ui_button_trigger(uint8_t button, uint8_t on);
 
+uint8_t get_list_pos();
+
 #endif /* UI_H_ */

@@ -21,7 +21,8 @@ typedef struct controllerInput{
 	uint8_t slider_one_value;
 	uint8_t slider_one_button;
 	uint8_t slider_two_value;
-	uint8_t slider_two_button;	
+	uint8_t slider_two_button;
+	int8_t joystick_trigger;
 } controllerInput;
 
 uint8_t joystickButton_Read();

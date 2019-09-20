@@ -9,7 +9,7 @@
 
 uint8_t joystickButton_Read(){
 	unsigned char i = PINB;
-	return (uint8_t) (i >> 0) & 1;
+	return !((uint8_t) (i >> 0) & 1);
 }
 
 uint8_t sliderButton1_Read(){
