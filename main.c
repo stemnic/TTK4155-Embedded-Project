@@ -9,12 +9,12 @@
 
 #include <avr/io.h>
 #include <stdio.h>
-#include "uart.h"
-#include "io.h"
-#include "sram.h"
-#include "adc.h"
-#include "oled.h"
-#include "oled_buffer.h"
+#include "drivers/uart.h"
+#include "drivers/io.h"
+#include "drivers/sram.h"
+#include "drivers/adc.h"
+#include "drivers/oled.h"
+#include "graphics/oled_buffer.h"
 
 #define BUFFER_LEN 128
 
@@ -81,8 +81,9 @@ void exercise4_2(){
 			draw_block_at(i, j, OLED_ADDR_OVERWRITE);
 		}
 	}
-	draw_string_at(1, 12, "Hello", FONT5x7, OLED_ADDR_INVERT);
-	draw_line(0, 0, 64, 128, OLED_ADDR_LAYER);
+	draw_string_at(1, 12, "Hello", FONT8x8, OLED_ADDR_INVERT);
+	draw_box(4, 4, 60, 124, 2, OLED_ADDR_INVERT);
+	flush_buffer();
 	flush_buffer();
 }
 

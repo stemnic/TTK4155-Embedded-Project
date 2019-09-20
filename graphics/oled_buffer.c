@@ -9,33 +9,39 @@
 #include <stdlib.h>
 volatile char* ext_ram = (char *) 0x1800;
 
+int changed = 1;
+
 void wipe_buffer() {
+	changed = 1;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 128; j++) {
-			ext_ram[i + (j << 3)] = 0x00;
+			ext_ram[((i << 7) + j) << 1] = 0x00;
 		}
 	}
 }
 
 void flush_buffer() {
+	if (!changed) return;
 	for (uint8_t i = 0; i < 8; i++) {
 		oled_command(PAGE_START_ADDR_PAGE_BASE + i);
 		for (uint8_t j = 0; j < 128; j++) {
-			oled_write_byte(ext_ram[i + (j << 3)]);
+			uint8_t val = ext_ram[((i << 7) + j) << 1];
+			oled_write_byte(val);
 		}
 	}
 }
 
 void draw_data_at(uint8_t row, uint8_t col, uint8_t data, uint8_t addressingMode) {
+	changed = 1;
 	switch(addressingMode) {
 	case OLED_ADDR_OVERWRITE:
-		ext_ram[row + col*8] = data;
+		ext_ram[((row << 7) + col) << 1] = data;
 		break;
 	case OLED_ADDR_LAYER:
-		ext_ram[row + col*8] |= data;
+		ext_ram[((row << 7) + col) << 1] |= data;
 		break;
 	case OLED_ADDR_INVERT:
-		ext_ram[row + col*8] = ext_ram[row + col * 8] & (~data);
+		ext_ram[((row << 7) + col) << 1] &= (~data);
 	}
 }
 
@@ -64,8 +70,9 @@ void draw_char_at(uint8_t row, uint8_t col, char towrite, uint8_t fontSize, uint
 	}
 }
 
-void draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8_t addressingMode) {
-	for (int i = 0; str[i] != '\0'; i++) {
+uint8_t draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8_t addressingMode) {
+	uint8_t i = 0;
+	for (i = 0; str[i] != '\0'; i++) {
 		draw_char_at(row, col + i*fontSize, str[i], fontSize, addressingMode);
 	}
 }
@@ -91,18 +98,28 @@ void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressin
 	}
 }
 
-void draw_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t width) {
+void draw_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t width, uint8_t addressingMode) {
 	int8_t sx = x0 < x1 ? 1 : -1;
 	int8_t sy = y0 < y1 ? 1 : -1;
 	while (width > 0) {
-		draw_line(x0, y0, x0, y1);
-		draw_line(x0, y0, x1, y0);
-		draw_line(x0, y1, x1, y1);
-		draw_line(x1, y0, x1, y1);
+		draw_line(x0, y0, x0, y1, addressingMode);
+		draw_line(x0, y0, x1, y0, addressingMode);
+		draw_line(x0, y1, x1, y1, addressingMode);
+		draw_line(x1, y0, x1, y1, addressingMode);
 		width -= 1;
 		x0 += sx;
 		y0 += sy;
 		x1 -= sx;
 		y1 -= sy;
+	}
+}
+
+void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode) {
+	int8_t sx = x0 < x1 ? 1 : -1;
+	int8_t sy = y0 < y1 ? 1 : -1;
+	for (int x = x0; x <= x1; x += sx) {
+		for (int y = y0; y <= y1; y += sy) {
+			draw_block_at(x, y, addressingMode);
+		}
 	}
 }

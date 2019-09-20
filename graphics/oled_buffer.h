@@ -10,7 +10,7 @@
 #define OLED_BUFFER_H_
 
 #include <avr/io.h>
-#include "oled.h"
+#include "../drivers/oled.h"
 
 
 #define OLED_ADDR_OVERWRITE 0
@@ -33,6 +33,11 @@ void draw_data_at(uint8_t row, uint8_t col, uint8_t data, uint8_t addressingMode
 void invert_block_at(uint8_t row, uint8_t col);
 //64x128
 void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode);
+void draw_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t width, uint8_t addressingMode);
+//8x12
+void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode);
+
+
 
 
 #endif /* OLED_BUFFER_H_ */
