@@ -169,9 +169,9 @@ int main(void)
 	
 	//exercise4_2();
 	int8_t joystick_trigger = 0;
-	uint8_t button_1;
-	uint8_t button_2;
-	uint8_t jbutton;
+	uint8_t button_1 = 0;
+	uint8_t button_2 = 0;
+	uint8_t jbutton = 0;
 	exercise5_1();
 	exercise5_2();
 	

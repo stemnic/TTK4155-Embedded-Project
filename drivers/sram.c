@@ -7,6 +7,7 @@
 
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "sram.h"
 
 void SRAM_init(){

@@ -8,7 +8,7 @@
 #include "spi.h"
 #include <stdio.h>
 #include <avr/interrupt.h>
-#include <avr/delay.h>
+#include <util/delay.h>
 
 #define DDRB_SS 4
 #define DDRB_MOSI 5
