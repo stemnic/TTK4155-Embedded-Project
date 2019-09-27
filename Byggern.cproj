@@ -152,6 +152,12 @@
     <Compile Include="drivers\io.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="drivers\mcp2515.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="drivers\mcp2515.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="drivers\oled.c">
       <SubType>compile</SubType>
     </Compile>
