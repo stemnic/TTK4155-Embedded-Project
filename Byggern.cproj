@@ -143,6 +143,12 @@
     <Compile Include="drivers\adc.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="drivers\can.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="drivers\can.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="drivers\fonts.h">
       <SubType>compile</SubType>
     </Compile>
@@ -152,10 +158,10 @@
     <Compile Include="drivers\io.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="drivers\mcp2515.c">
+    <Compile Include="drivers\mcp.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="drivers\mcp2515.h">
+    <Compile Include="drivers\mcp.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="drivers\oled.c">

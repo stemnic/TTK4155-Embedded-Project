@@ -6,7 +6,7 @@
  */ 
 
 
-#include "mcp2515.h"
+#include "mcp.h"
 #include "spi.h"
 #include <stdlib.h>
 //void spi_sendData(char *cData, int cDataLen);
@@ -45,7 +45,13 @@ void mcp_read_array(int mode, uint8_t addr, uint8_t *arr, uint8_t len){
 }
 
 uint8_t mcp_read_status(){
-	char arr[3] = {0xc0};
+	char arr[3] = {0xA0};
+	spi_sendData(arr, 3);
+	return arr[1];
+}
+
+uint8_t mcp_read_filter_status() {
+	char arr[3] = {0xB0};
 	spi_sendData(arr, 3);
 	return arr[1];
 }
@@ -76,7 +82,7 @@ void mcp_write_array(int mode, uint8_t addr, uint8_t *arr, uint8_t len) {
 	for (int i = 0; i < len; i++) {
 		buff[i+1] = arr[i];
 	}
-	buff[0] = 0x80|addr;
+	buff[0] = 0x40|addr;
 	spi_sendData(buff, len + 1);
 	free(buff);
 }

@@ -19,7 +19,7 @@ void spi_init(){
 	/* Set MOSI, SS and SCK output, all others input */
 	DDRB |= (1<<DDRB_MOSI)|(1<<DDRB_SCK)|(1<<DDRB_SS);
 	/* Enable SPI, Master, set clock rate fck/16 */
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0)|(1<<SPIE);
+	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);//|(1<<SPIE);
 	//CPOL=1 and CPHA=1 for SPI mode 3, trying SPI mode 0 |(1<<CPOL)|(1<<CPHA)
 	sei();
 }
@@ -32,45 +32,27 @@ void spi_endcom(){
 	PORTB |= (1<<DDRB_SS);
 }
 
-int dataLen = 0;
-int current = 0;
-char *buff;
-int transdone = 0;
 
-void spi_sendData(char *cData, int cDataLen){
+void spi_sendData(char *buff, int dataLen){
 	/* Start transmission */
-	buff = cData;
-	dataLen = cDataLen;
-	current = 0;
-	transdone = 0;
+	int current = 0;
 	SPDR = buff[0];
 	spi_startcom();
-	while (!transdone){
-		_delay_us(1);
+	while (current < dataLen) {
+		while (!(SPSR & (1 << SPIF))) _delay_us(1);
+		buff[current] = SPDR;
+			
+		current++;
+			
+		if (current < dataLen) {
+			SPDR = buff[current];
+		}
 	}
 	spi_endcom();
-	printf("SPI Data:");
-	for (int i = 0; i < cDataLen; i++) {
+	/*printf("SPI Data %i:", dataLen);
+	for (int i = 0; i < dataLen; i++) {
 		printf(" %i", (uint8_t)buff[i]);
 	}
-	printf("\n");
-}
-/*	for(int i=0; i<cDataLen; i++){
-		SPDR = cData;
-		// Wait for transmission complete
-		while(!(SPSR & (1<<SPIF)));
-	}
-}*/
-
-ISR (SPI_STC_vect){
-	buff[current] = SPDR;
-		
-	current++;
-		
-	if (current < dataLen) {
-		SPDR = buff[current];
-	} else {
-		transdone = 1;
-	}
+	printf("\n");*/
 }
 

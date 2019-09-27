@@ -16,6 +16,7 @@
 #include "drivers/adc.h"
 #include "drivers/oled.h"
 #include "drivers/spi.h"
+#include "drivers/can.h"
 #include "graphics/oled_buffer.h"
 #include "graphics/ui.h"
 
@@ -99,6 +100,34 @@ void exercise5_1(){
 
 }
 
+void exercise5_2() {
+	// Set device to loopback
+	can_set_device_mode(CAN_MODE_LOOPBACK);
+
+	char charSendTest[3] = {0x3, 0x0E, 0x00};
+	//char charRecTest[3] = {0xa0, 0xa0, 0x00};
+	spi_sendData(charSendTest, 3);
+	//mcp_read_status();
+
+	can_msg_t msg;
+	uint8_t data1[4] = {1, 2, 3, 4};
+	msg.data = data1;
+	msg.dataLen = 4;
+	msg.id = 0x1FF;
+	can_send_data(&msg, CAN_TX0);
+	printf("Successfully sent data\n");
+	can_msg_t msg2;
+	uint8_t data2[4];
+	msg2.data = data2;
+	msg2.dataLen = 4;
+	can_receive_data(&msg2);
+	printf("Receive msg with id: %i, len: %i\n", msg2.id, msg2.dataLen);
+	for (int i = 0; i < msg2.dataLen; i++) {
+		printf("  %i: %i", i, msg2.data[i]);
+	}
+	printf("\n");
+}
+
 void process_cycle_clock_init(){
 	TCCR0 |= (0b100 << 0); // clk/256 will interrupt at an interval of 13ms
 	TIMSK |= (1 << 1); // Overflow interrupt enable
@@ -129,6 +158,7 @@ int main(void)
 	ADC_init();
 	oled_init();
 	spi_init();
+	can_init();
 	
 	wipe_buffer();
 	char * liststr[4] = { "test1", "test2", "test3", "test4" };
@@ -142,8 +172,8 @@ int main(void)
 	uint8_t button_1;
 	uint8_t button_2;
 	uint8_t jbutton;
-	
 	exercise5_1();
+	exercise5_2();
 	
 	while (1){
 		if (adc_read){
