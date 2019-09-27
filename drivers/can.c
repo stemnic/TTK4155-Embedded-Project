@@ -9,6 +9,7 @@
 #include <avr/interrupt.h>
 
 uint8_t int_status;
+uint8_t int_trigger = 0;
 
 #define CANINTE 0x2B
 
@@ -17,6 +18,14 @@ uint8_t int_status;
 
 void can_set_device_mode(uint8_t mode) {
 	mcp_bit_modify(0xE0, 0x0F, mode << 5);
+}
+
+void wait_for_interupt(uint8_t mask) {
+	while (!(int_status & mask)) {
+		while (!int_trigger) _delay_us(1);
+		int_status = mcp_read(MCP_MODE_CMD, CANINTF);
+		int_trigger = 0;
+	}
 }
 
 void can_init() {
@@ -58,14 +67,13 @@ void can_send_data(can_msg_t *data, uint8_t buffNum) {
 	}
 	mcp_write_array(MCP_MODE_CAN, addr, raw, data->dataLen + 5);
 	mcp_rts(buffNum - CAN_TX0);
-	while (!(int_status & (1 << buffNum))) _delay_us(1);
+	wait_for_interupt(1 << buffNum);
 	mcp_bit_modify(1 << buffNum, CANINTF, 0);
 	int_status &= ~(1 << buffNum);
-	_delay_ms(1000);
 }
 
 void can_receive_data(can_msg_t *data) {
-	while (!(int_status & (3 << CAN_RX0))) _delay_us(1);
+	wait_for_interupt(3 << CAN_RX0);
 	uint8_t buffNum = (int_status & (1 << CAN_RX0)) ? CAN_RX0 : CAN_RX1;
 	uint8_t addr = 0;
 	switch (buffNum) {
@@ -88,5 +96,5 @@ void can_receive_data(can_msg_t *data) {
 }
 
 ISR (INT1_vect) {
-	int_status = mcp_read(MCP_MODE_CMD, CANINTF);
+	int_trigger = 1;
 }
