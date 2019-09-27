@@ -8,12 +8,14 @@
 #define F_CPU 4915200
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <stdio.h>
 #include "drivers/uart.h"
 #include "drivers/io.h"
 #include "drivers/sram.h"
 #include "drivers/adc.h"
 #include "drivers/oled.h"
+#include "drivers/spi.h"
 #include "graphics/oled_buffer.h"
 #include "graphics/ui.h"
 
@@ -88,6 +90,15 @@ void exercise4_2(){
 	flush_buffer();
 }
 
+void exercise5_1(){
+	
+	char charSendTest[3] = {0x3, 0x0E, 0xF0};
+	//char charRecTest[3] = {0xa0, 0xa0, 0x00};
+	spi_sendData(charSendTest, 3);
+	//spi_sendData(charRecTest, 3);
+
+}
+
 void process_cycle_clock_init(){
 	TCCR0 |= (0b100 << 0); // clk/256 will interrupt at an interval of 13ms
 	TIMSK |= (1 << 1); // Overflow interrupt enable
@@ -117,6 +128,7 @@ int main(void)
 	SRAM_test();
 	ADC_init();
 	oled_init();
+	spi_init();
 	
 	wipe_buffer();
 	char * liststr[4] = { "test1", "test2", "test3", "test4" };
@@ -130,6 +142,9 @@ int main(void)
 	uint8_t button_1;
 	uint8_t button_2;
 	uint8_t jbutton;
+	
+	exercise5_1();
+	
 	while (1){
 		if (adc_read){
 			getControllerButtons(&input);
