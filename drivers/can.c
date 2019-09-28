@@ -4,9 +4,11 @@
  * Created: 27/09/2019 11:49:26
  *  Author: Einar
  */ 
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/delay.h>
 #include "can.h"
 #include "mcp.h"
-#include <avr/interrupt.h>
 
 uint8_t int_status;
 uint8_t int_trigger = 0;

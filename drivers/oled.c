@@ -5,6 +5,7 @@
  *  Author: Ole Sivert
  */ 
 
+#include <avr/io.h>
 #include "oled.h"
 #include "fonts.h"
 

@@ -4,7 +4,7 @@
  * Created: 06.09.2019 10:13:09
  *  Author: Ole Sivert
  */ 
-
+#include <avr/io.h>
 #include "io.h"
 
 uint8_t joystickButton_Read(){

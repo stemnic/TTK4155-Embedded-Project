@@ -9,8 +9,6 @@
 #ifndef MCP_H_
 #define MCP_H_
 
-#include <avr/io.h>
-
 #define MCP_MODE_CMD 0
 #define MCP_MODE_CAN 1
 

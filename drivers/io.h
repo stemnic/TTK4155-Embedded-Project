@@ -9,7 +9,7 @@
 #ifndef IO_H_
 #define IO_H_
 
-#include <avr/io.h>
+#include <stdint.h>
 
 #define BUTTON_1 1
 #define BUTTON_2 2

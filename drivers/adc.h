@@ -7,10 +7,6 @@
 
 #define F_CPU 4915200
 
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avr/interrupt.h>
-
 #ifndef ADC_H_
 #define ADC_H_
 

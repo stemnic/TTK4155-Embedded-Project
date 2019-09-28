@@ -6,11 +6,6 @@
  */ 
 #define F_CPU 4915200
 
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avr/interrupt.h>
-#include <stdio.h>
-
 #ifndef UART_H_
 #define UART_H_
 #define BAUD 9600

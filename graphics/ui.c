@@ -8,6 +8,7 @@
 #include "oled_buffer.h"
 #include "ui.h"
 #include "../drivers/io.h"
+#include "../drivers/oled.h"
 
 uint8_t listSel = 0;
 uint8_t listLen = 0;

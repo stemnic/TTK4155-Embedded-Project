@@ -5,8 +5,6 @@
  *  Author: Ole Sivert
  */ 
 
-#include <avr/io.h>
-
 #ifndef SPI_H_
 #define SPI_H_
 

@@ -5,10 +5,11 @@
  *  Author: Audun
  */ 
 
-
+#include <stdlib.h>
+#include <avr/io.h>
 #include "mcp.h"
 #include "spi.h"
-#include <stdlib.h>
+
 //void spi_sendData(char *cData, int cDataLen);
 
 

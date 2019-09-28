@@ -4,11 +4,11 @@
  * Created: 27.09.2019 08:32:58
  *  Author: Ole Sivert
  */ 
-
-#include "spi.h"
 #include <stdio.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#include <avr/io.h>
+#include "spi.h"
 
 #define DDRB_SS 4
 #define DDRB_MOSI 5

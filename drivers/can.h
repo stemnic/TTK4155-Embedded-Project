@@ -9,11 +9,6 @@
 #ifndef CAN_H_
 #define CAN_H_
 
-#define F_CPU 4915200
-
-#include <avr/io.h>
-#include <util/delay.h>
-
 #define CAN_MODE_NORMAL 0
 #define CAN_MODE_SLEEP 1
 #define CAN_MODE_LOOPBACK 2

@@ -4,6 +4,9 @@
  * Created: 13.09.2019 09:18:14
  *  Author: Ole Sivert
  */
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
 #include "adc.h"
 
 uint8_t waitingForADC = 0;

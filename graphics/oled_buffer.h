@@ -9,9 +9,7 @@
 #ifndef OLED_BUFFER_H_
 #define OLED_BUFFER_H_
 
-#include <avr/io.h>
-#include "../drivers/oled.h"
-
+#include <stdint.h>
 
 #define OLED_ADDR_OVERWRITE 0
 #define OLED_ADDR_LAYER 1

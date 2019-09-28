@@ -9,9 +9,6 @@
 #ifndef OLED_H_
 #define OLED_H_
 
-#include <avr/io.h>
-
-
 #define DISPLAY_OFF 0xae
 #define DISPLAY_ON 0xaf
 #define MEMORY_ADDR_MODE 0x20

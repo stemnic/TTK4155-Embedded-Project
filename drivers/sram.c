@@ -8,6 +8,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
 #include "sram.h"
 
 void SRAM_init(){

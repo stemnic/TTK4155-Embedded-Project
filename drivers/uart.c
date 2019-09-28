@@ -4,8 +4,12 @@
  * Created: 30/08/2019 12:43:18
  *  Author: Einar
  */ 
-
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#include <stdio.h>
 #include "uart.h"
+
 #define F_CPU 4915200
 #define UBBR (F_CPU/16/BAUD-1)
 

@@ -4,7 +4,8 @@
  * Created: 20/09/2019 09:24:39
  *  Author: Einar
  */ 
-
+#include <avr/io.h>
+#include "../drivers/oled.h"
 #include "oled_buffer.h"
 #include <stdlib.h>
 volatile char* ext_ram = (char *) 0x1800;

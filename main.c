@@ -9,6 +9,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include <stdio.h>
 #include "drivers/uart.h"
 #include "drivers/io.h"
