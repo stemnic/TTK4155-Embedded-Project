@@ -11,7 +11,7 @@
 #define BAUD 9600
 
 // Initialize USART driver
-void uart_init(char* _buffer, uint16_t len);
+void uart_init();
 
 // Transmit a single character over uart, busy-waiting until sent.
 void uart_transmit(char data);
@@ -22,7 +22,7 @@ int uart_transmit_stdio(char data, FILE* file);
 void uart_print(const char string[]);
 
 // Dequeue the last received 
-int uart_receive(char* buff, uint16_t maxLen);
+//int uart_receive(char* buff, uint16_t maxLen);
 
 int uart_receive_char();
 

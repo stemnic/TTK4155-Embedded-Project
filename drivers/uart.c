@@ -13,15 +13,7 @@
 #define F_CPU 4915200
 #define UBBR (F_CPU/16/BAUD-1)
 
-char* buffer;
-int bufferLen = 0;
-int bufferHead = 0;
-int bufferTail = 0;
-
-
-void uart_init(char* _buffer, uint16_t len) {
-	buffer = _buffer;
-	bufferLen = len;
+void uart_init() {
 	/* Set baud rate */
 	UBRR0H = (unsigned char)(UBBR >> 8);
 	UBRR0L = (unsigned char)UBBR;
@@ -56,7 +48,7 @@ int uart_receive_char() {
 	return (int)dat;
 }
 
-int uart_receive(char* buff, uint16_t maxLen) {
+/*int uart_receive(char* buff, uint16_t maxLen) {
 	int cnt = 0;
 	char last = '\0';
 	if (bufferHead == bufferTail) return 0;
@@ -79,4 +71,4 @@ ISR (USART0_RXC_vect) {
 	if (bufferHead == bufferTail) {
 		bufferHead = (bufferHead + 1) % bufferLen;
 	}
-}
+}*/

@@ -21,24 +21,11 @@
 #include "graphics/oled_buffer.h"
 #include "graphics/ui.h"
 
-#define BUFFER_LEN 128
-
 void exercise1v1() {
 	char recBuffer[128];
 	for (;;) {
 		gets(recBuffer);
 		printf(recBuffer);
-	}
-}
-
-void exercise1v2() {
-	char recBuffer[128];
-	for (;;) {
-		if (uart_receive(recBuffer, 128)) {
-			// uart_print(recBuffer);
-			printf(recBuffer);
-			printf("Got some stuff yo\n");
-		}
 	}
 }
 
@@ -149,8 +136,7 @@ void process_cycle(){
 
 int main(void)
 {
-	char buffer[BUFFER_LEN];
-	uart_init(buffer, BUFFER_LEN);
+	uart_init();
 	fdevopen(uart_transmit_stdio, uart_receive_char);
 	//fdevopen(oled_write_char,uart_receive_char);
 	
