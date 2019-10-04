@@ -24,29 +24,32 @@ void can_set_device_mode(uint8_t mode) {
 
 void can_init() {
 	// Enable interrupts on any transmit buffer empty, or receive buffer full, as well as error during rec/transmission
+	can_set_device_mode(CAN_MODE_CONFIGURATION);
 	mcp_write(MCP_MODE_CMD, CANINTE, (1 << CAN_RX0)|(1 << CAN_RX1)|(1 << CAN_TX0)|(1 << CAN_TX1)|(1 << CAN_TX2)|(1 << CAN_ERR));
 	// Enable interrupt 1 on falling edge
-	EIMSK |= (1<<INT2);
-	EICRB |= (0b10 << 4);
+	
+	//EIMSK |= (1<<INT2);
+	//EICRA |= (0b10 << 4);
 	// Enable all messages on all buffers
 	mcp_write(MCP_MODE_CMD, 0x60, 0x60);
 	mcp_write(MCP_MODE_CMD, 0x70, 0x60);
+	mcp_write(MCP_MODE_CMD, CANINTF, 0);
 }
 
 void can_send_data(can_msg_t *data) {
 	while ((buffer_waiting & (7 << CAN_TX0)) == (7 << CAN_TX0)) {
-		while (!int_trigger) _delay_us(1);
+		while (PORTD & (1 << PD2)) _delay_us(1);
 		uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
-		printf("Interrupt flag status: %i\n",int_status);
+		mcp_write(MCP_MODE_CMD, CANINTF, 0);
 		buffer_waiting &= ~int_status;
 		int_trigger = 0;
 		if (int_status & (1 << CAN_ERR)) {
-			mcp_bit_modify(1 << CAN_ERR, CANINTF, 0);
 			uint8_t errFlag = mcp_read(MCP_MODE_CMD, 0x2d);
 			printf("Error sending message: %i\n", errFlag);
 			return;
 		}
 	}
+	
 	uint8_t buffNum;
 	uint8_t addr;
 	if (!(buffer_waiting & (1 << CAN_TX0))) {
@@ -59,7 +62,7 @@ void can_send_data(can_msg_t *data) {
 		buffNum = CAN_TX2;
 		addr = 4;
 	}
-	mcp_bit_modify(1 << buffNum, CANINTF, 0);
+	printf("Send message on buff: %i\n", buffNum);
 	uint8_t raw[13];
 	// Id high/low bits, 11 bit
 	raw[0] = (uint8_t)(data->id >> 3);
@@ -80,10 +83,11 @@ void can_send_data(can_msg_t *data) {
 }
 
 void can_receive_data(can_msg_t *data) {
-	while ((buffer_waiting & (3 << CAN_RX0)) == 3 << CAN_RX0) {
-		while (!int_trigger) _delay_us(1);
+	while ((buffer_waiting & (3 << CAN_RX0)) == (3 << CAN_RX0)) {
+		while (PORTD & (1 << PD2)) _delay_us(1);
 		int_trigger = 0;
 		uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
+		mcp_write(MCP_MODE_CMD, CANINTF, 0);
 		buffer_waiting &= ~int_status;
 	}
 	uint8_t buffNum;
@@ -108,5 +112,4 @@ void can_receive_data(can_msg_t *data) {
 
 ISR (INT2_vect) {
 	int_trigger = 1;
-	//printf("int here");
 }

@@ -127,7 +127,6 @@ void exercise6(){
 	can_send_data(&message);
 	while (1)
 	{
-		/*
 		printf("Waiting for data from can client\n");
 		can_receive_data(&message);
 		printf("Receive msg with id: %i, len: %i\n", message.id, message.dataLen);
@@ -136,7 +135,6 @@ void exercise6(){
 		}
 		printf("\n");
 		message.data[0]++;
-		*/
 		can_send_data(&message);
 		printf("Can message was sent\n");
 		_delay_ms(1000);
@@ -188,8 +186,15 @@ int main(void)
 	uint8_t jbutton = 0;
 	//exercise5_1();
 	//exercise5_2();
+	//exercise6();
 	
-	exercise6();
+	can_set_device_mode(CAN_MODE_NORMAL);
+	
+	uint8_t data[3];
+	can_msg_t msg;
+	msg.id = 1;
+	msg.data = data;
+	msg.dataLen = 3;
 	
 	while (1){
 		if (adc_read){
@@ -228,6 +233,11 @@ int main(void)
 			
 			adc_read = 0;
 			flush_buffer();
+			
+			data[0] = input.joystick_x;
+			data[1] = input.joystick_y;
+			data[2] = input.joystick_button;
+			can_send_data(&msg);
 		}
 		_delay_ms(1);
 	}
