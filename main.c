@@ -115,7 +115,7 @@ void exercise5_2() {
 	msg.data = data1;
 	msg.dataLen = 4;
 	msg.id = 0x1FF;
-	can_send_data(&msg, CAN_TX0);
+	can_send_data(&msg);
 	printf("Successfully sent data\n");
 	can_msg_t msg2;
 	uint8_t data2[4];
