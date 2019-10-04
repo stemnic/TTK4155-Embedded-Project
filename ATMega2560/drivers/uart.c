@@ -10,7 +10,8 @@
 #include <stdio.h>
 #include "uart.h"
 
-#define F_CPU 4915200
+//UDR0 Data
+
 #define UBBR (F_CPU/16/BAUD-1)
 
 void uart_init() {
@@ -19,8 +20,6 @@ void uart_init() {
 	UBRR0L = (unsigned char)UBBR;
 	/* Enable receiver and transmitter and rx flag*/
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
-	/* Set frame format: 8data, 1stop bit */
-	UCSR0C = (1<<URSEL0)|(3<<UCSZ00);
 	sei();
 }
 

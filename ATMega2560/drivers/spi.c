@@ -10,10 +10,10 @@
 #include <avr/io.h>
 #include "spi.h"
 
-#define DDRB_SS 4
-#define DDRB_MOSI 5
-#define DDRB_MISO 6
-#define DDRB_SCK 7
+#define DDRB_SS 0
+#define DDRB_MOSI 2
+#define DDRB_MISO 3
+#define DDRB_SCK 1
 
 void spi_init(){
 	/* Set MOSI, SS and SCK output, all others input */

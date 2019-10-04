@@ -116,6 +116,33 @@ void exercise5_2() {
 	printf("\n");
 }
 
+void exercise6(){
+	can_set_device_mode(CAN_MODE_NORMAL);
+	uint8_t buffer[4] = { 1, 2, 3, 4 };
+	can_msg_t message;
+	message.data = buffer;
+	message.dataLen = 4;
+	message.id = 0x1ff;
+	printf("Sending test CAN Data\n");
+	can_send_data(&message);
+	while (1)
+	{
+		/*
+		printf("Waiting for data from can client\n");
+		can_receive_data(&message);
+		printf("Receive msg with id: %i, len: %i\n", message.id, message.dataLen);
+		for (int i = 0; i < message.dataLen; i++) {
+			printf("  %i: %i", i, message.data[i]);
+		}
+		printf("\n");
+		message.data[0]++;
+		*/
+		can_send_data(&message);
+		printf("Can message was sent\n");
+		_delay_ms(1000);
+	}
+}
+
 void process_cycle_clock_init(){
 	TCCR0 |= (0b100 << 0); // clk/256 will interrupt at an interval of 13ms
 	TIMSK |= (1 << 1); // Overflow interrupt enable
@@ -159,8 +186,10 @@ int main(void)
 	uint8_t button_1 = 0;
 	uint8_t button_2 = 0;
 	uint8_t jbutton = 0;
-	exercise5_1();
-	exercise5_2();
+	//exercise5_1();
+	//exercise5_2();
+	
+	exercise6();
 	
 	while (1){
 		if (adc_read){

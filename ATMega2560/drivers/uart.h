@@ -4,7 +4,6 @@
  * Created: 30/08/2019 12:43:30
  *  Author: Einar
  */ 
-#define F_CPU 4915200
 
 #ifndef UART_H_
 #define UART_H_

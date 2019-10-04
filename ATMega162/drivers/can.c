@@ -37,8 +37,15 @@ void can_send_data(can_msg_t *data) {
 	while ((buffer_waiting & (7 << CAN_TX0)) == (7 << CAN_TX0)) {
 		while (!int_trigger) _delay_us(1);
 		uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
+		printf("Interrupt flag status: %i\n",int_status);
 		buffer_waiting &= ~int_status;
 		int_trigger = 0;
+		if (int_status & (1 << CAN_ERR)) {
+			mcp_bit_modify(1 << CAN_ERR, CANINTF, 0);
+			uint8_t errFlag = mcp_read(MCP_MODE_CMD, 0x2d);
+			printf("Error sending message: %i\n", errFlag);
+			return;
+		}
 	}
 	uint8_t buffNum;
 	uint8_t addr;
