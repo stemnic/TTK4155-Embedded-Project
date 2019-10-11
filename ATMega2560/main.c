@@ -14,6 +14,14 @@
 #include "drivers/spi.h"
 #include "drivers/can.h"
 #include "drivers/pwm.h"
+#include "drivers/adc.h"
+
+uint16_t score = 0;
+
+void score_add(){
+	score++;
+	printf("Current score: %i\n", score);
+}
 
 int main(void)
 {
@@ -24,6 +32,9 @@ int main(void)
 	can_init();
 	
 	can_set_device_mode(CAN_MODE_NORMAL);
+	
+	pwm_init();
+	adc_init();
 		
     // Replace with your application code 
 	printf("Init Complete\n");
@@ -55,10 +66,22 @@ int main(void)
 		printf("Can message was sent\n");
 		//_delay_ms(1000);
     }*/
-	pwm_init();
-	while (1) {
+	uint8_t previous_ir_trigger = 0;
+	uint16_t previous_ir_value = 0;
+	while (1) {		
+		uint8_t ir_trigger = (adc_get_ir_conversion() < 500);
+		
+		if (ir_trigger != previous_ir_trigger) {
+			//printf ("ir trigger: %i\n", ir_trigger);
+			previous_ir_trigger = ir_trigger;
+			if (ir_trigger == 1){
+				score_add();
+			}
+		}
+		
 		can_receive_blocking(&message);
-		printf("x: %i, y: %i, button: %i, slider: %i\n", (int8_t)message.data[0], (int8_t)message.data[1], message.data[2], (uint8_t)message.data[3]);
+		//printf("ir trigger: %i\n", ir_trigger);
+		//printf("x: %i, y: %i, button: %i, slider: %i\n", (int8_t)message.data[0], (int8_t)message.data[1], message.data[2], (uint8_t)message.data[3]);
 		pwm_set_position(message.data[3]);
 	}
 }

@@ -140,6 +140,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="drivers\adc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="drivers\adc.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="drivers\can.c">
       <SubType>compile</SubType>
     </Compile>
