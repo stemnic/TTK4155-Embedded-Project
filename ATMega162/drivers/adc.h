@@ -22,8 +22,8 @@
 
 void ADC_init();
 
-int8_t getJoystickValue(int value);
-uint8_t getSliderValue(int value);
+int8_t get_joystick_value(int value);
+uint8_t get_slider_value(int value);
 
 
 

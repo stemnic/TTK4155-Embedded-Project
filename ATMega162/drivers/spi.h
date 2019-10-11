@@ -11,7 +11,7 @@
 
 void spi_init();
 
-void spi_sendData(char *cData, int cDataLen);
+void spi_send_data(char *cData, int cDataLen);
 
 
 #endif /* SPI_H_ */

@@ -25,6 +25,7 @@
 #define FONT8x8 8
 #define FONT5x7 5
 #define FONT4x6 4
+#define NUMBERS9x16 9
 
 
 void oled_init();
@@ -34,6 +35,7 @@ void oled_write_char (char chr);
 void oled_command(uint8_t command);
 void oled_write_byte(uint8_t data);
 uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize);
+uint16_t get_font_dword(int index, uint8_t col, uint8_t img);
 
 
 

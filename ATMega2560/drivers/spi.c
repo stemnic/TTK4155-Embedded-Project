@@ -23,20 +23,20 @@ void spi_init(){
 	//CPOL=1 and CPHA=1 for SPI mode 3, trying SPI mode 0 |(1<<CPOL)|(1<<CPHA)
 }
 
-void spi_startcom(){
+void spi_start_communication(){
 	PORTB &= ~(1<<DDRB_SS);
 }
 
-void spi_endcom(){
+void spi_end_communication(){
 	PORTB |= (1<<DDRB_SS);
 }
 
 
-void spi_sendData(char *buff, int dataLen){
+void spi_send_data(char *buff, int dataLen){
 	/* Start transmission */
 	int current = 0;
 	SPDR = buff[0];
-	spi_startcom();
+	spi_start_communication();
 	while (current < dataLen) {
 		while (!(SPSR & (1 << SPIF))) _delay_us(1);
 		buff[current] = SPDR;
@@ -47,7 +47,7 @@ void spi_sendData(char *buff, int dataLen){
 			SPDR = buff[current];
 		}
 	}
-	spi_endcom();
+	spi_end_communication();
 	/*printf("SPI Data %i:", dataLen);
 	for (int i = 0; i < dataLen; i++) {
 		printf(" %i", (uint8_t)buff[i]);

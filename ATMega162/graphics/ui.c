@@ -45,6 +45,8 @@ void ui_button_trigger(uint8_t button, uint8_t on) {
 	}
 }
 
+
+
 void ui_list_update(int8_t joystick_trigger) {
 	if (joystick_trigger != 0 && (joystick_trigger != 1 || listSel > 0) && (joystick_trigger != -1 || listSel < listLen - 1)) {
 		ui_list_select(listSel);

@@ -136,6 +136,15 @@ uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize) {
 	}
 }
 
+uint16_t get_font_dword(int index, uint8_t col, uint8_t img) {
+	switch (img) {
+		case NUMBERS9x16:
+			return pgm_read_dword(&(font16[index][col]));
+		default:
+			return 0;
+	}
+}
+
 void oled_write_byte(uint8_t data) {
 	oled_data[0] = data;
 }

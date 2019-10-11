@@ -23,8 +23,7 @@ void score_add(){
 	printf("Current score: %i\n", score);
 }
 
-int main(void)
-{
+int main(void) {
 	uart_init();
 	fdevopen(uart_transmit_stdio, uart_receive_char);
 	spi_init();

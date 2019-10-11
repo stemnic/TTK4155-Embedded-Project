@@ -17,7 +17,7 @@ int16_t yMean;
 
 volatile char *ext_adc = (char *) 0x1400;
 
-int8_t getJoystickValueInternal(int value, int raw) {
+int8_t get_joystick_value_internal(int value, int raw) {
 	ext_adc[0] = value == JOYSTICK_X ? ADC_CH1 : ADC_CH2;
 	waitingForADC = 1;
 	
@@ -32,16 +32,16 @@ int8_t getJoystickValueInternal(int value, int raw) {
 	return (int8_t)tempValue;
 }
 
-int8_t getJoystickValue(int value) {
-	return getJoystickValueInternal(value, 0);
+int8_t get_joystick_value(int value) {
+	return get_joystick_value_internal(value, 0);
 }
 
-void calJoystick(){
+void calibrate_joystick(){
 	int xtotal = 0;
 	int ytotal = 0;
 	for (int i = 0; i < 100; i++) {
-		xtotal += (uint8_t)getJoystickValueInternal(JOYSTICK_X, 1);
-		ytotal += (uint8_t)getJoystickValueInternal(JOYSTICK_Y, 1);
+		xtotal += (uint8_t)get_joystick_value_internal(JOYSTICK_X, 1);
+		ytotal += (uint8_t)get_joystick_value_internal(JOYSTICK_Y, 1);
 	}
 
 	xMean = xtotal / 100;
@@ -53,10 +53,10 @@ void ADC_init(){
 	MCUCR |= (ISC10 << 0);
 	//Enables INT0
 	GICR |= (1 << 6);
-	calJoystick();
+	calibrate_joystick();
 }
 
-uint8_t getSliderValue(int value) {
+uint8_t get_slider_value(int value) {
 	ext_adc[0] = value == SLIDER_1 ? ADC_CH3 : ADC_CH4;
 	waitingForADC = 1;
 	

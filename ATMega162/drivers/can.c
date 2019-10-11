@@ -37,11 +37,15 @@ void can_init() {
 	mcp_write(MCP_MODE_CMD, CANINTF, 0);
 }
 
-void can_send_data(can_msg_t *data) {
-	while ((buffer_waiting & (7 << CAN_TX0)) == (7 << CAN_TX0)) {
-		while (PORTD & (1 << PD3)) _delay_us(1);
+void wait_for_trigger(uint8_t mask) {
+	while ((buffer_waiting & mask) == mask) {
+		// Wait for interrupt pin to go low
+		while (PORTD & (1 << PD2)) _delay_us(1);
+		// Read active interrupt pins
 		uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
+		// Clear interrupt pins
 		mcp_write(MCP_MODE_CMD, CANINTF, 0);
+		// Record interrupt status locally. buffer_wating indicates whether the buffer in question is empty or not.
 		buffer_waiting &= ~int_status;
 		int_trigger = 0;
 		/* if (int_status & (1 << CAN_ERR)) {
@@ -50,6 +54,11 @@ void can_send_data(can_msg_t *data) {
 			return;
 		} */
 	}
+}
+
+void can_send_data(can_msg_t *data) {
+	wait_for_trigger(7 << CAN_TX0);
+	
 	uint8_t buffNum;
 	uint8_t addr;
 	if (!(buffer_waiting & (1 << CAN_TX0))) {
@@ -62,7 +71,6 @@ void can_send_data(can_msg_t *data) {
 		buffNum = CAN_TX2;
 		addr = 4;
 	}
-	//printf("Send message on buff: %i\n", buffNum);
 	uint8_t raw[13];
 	// Id high/low bits, 11 bit
 	raw[0] = (uint8_t)(data->id >> 3);
@@ -94,13 +102,8 @@ uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
 		}
 	}
 	
-	while ((buffer_waiting & (3 << CAN_RX0)) == 3 << CAN_RX0) {
-		while (PORTD & (1 << PD3)) _delay_us(1);
-		int_trigger = 0;
-		uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
-		mcp_write(MCP_MODE_CMD, CANINTF, 0);
-		buffer_waiting &= ~int_status;
-	}
+	wait_for_trigger(3 << CAN_RX0);
+
 	uint8_t buffNum;
 	uint8_t addr;
 	if (!(buffer_waiting & (1 << CAN_RX0))) {

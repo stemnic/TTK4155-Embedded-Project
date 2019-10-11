@@ -48,27 +48,3 @@ int uart_receive_char() {
 	return (int)dat;
 }
 
-/*int uart_receive(char* buff, uint16_t maxLen) {
-	int cnt = 0;
-	char last = '\0';
-	if (bufferHead == bufferTail) return 0;
-	do {
-		if (bufferHead != bufferTail) {
-		last = buffer[bufferHead];
-		buff[cnt] = last;
-		cnt++;
-		bufferHead = (bufferHead + 1) % bufferLen;
-		}
-	} while (last != '\0' && cnt < maxLen);
-	//buff[maxLen - 1] = '\0';
-	return cnt;
-}
-
-ISR (USART0_RXC_vect) {
-	char dat = UDR0;
-	buffer[bufferTail] = dat;
-	bufferTail = (bufferTail + 1) % bufferLen;
-	if (bufferHead == bufferTail) {
-		bufferHead = (bufferHead + 1) % bufferLen;
-	}
-}*/
