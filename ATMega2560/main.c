@@ -23,6 +23,24 @@ void score_add(){
 	printf("Current score: %i\n", score);
 }
 
+void solenoid_init(){
+	PORTL |= (1 << PL6);
+	DDRL |= (1 << PL6);
+}
+
+uint8_t solenoid_status = 0;
+
+void solenoid_fire(){
+	PORTL &= ~(1 << PL6);
+	solenoid_status = 0;
+}
+
+void solenoid_reset() {
+	if (solenoid_status++ == 5) {
+		PORTL |= (1 << PL6);
+	}
+}
+
 void process_cycle_clock_init() {
 		PRR0 &= ~(1 << PRTIM0);
 		TCCR0B = 0                                          /* TC8 Mode 0 Normal */
@@ -51,6 +69,8 @@ int main(void) {
 	pwm_init();
 	adc_init();
 	
+	solenoid_init();
+	
 	process_cycle_clock_init();
 		
     // Replace with your application code 
@@ -76,11 +96,12 @@ int main(void) {
 				if (ir_trigger == 1){
 					can_send_data(&scoremsg);
 					score_add();
+					solenoid_fire();
 				}
 			}
 			timer_int_trigger = 0;
+			solenoid_reset();
 		}
-
 		
 		if (can_try_receive(&message)) {
 			if (message.id == 1) {

@@ -7,6 +7,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdio.h>
 #include "can.h"
 #include "mcp.h"
 
@@ -41,17 +42,20 @@ void wait_for_trigger(uint8_t mask) {
 		// Wait for interrupt pin to go low
 		while (PORTD & (1 << PD2)) _delay_us(1);
 		// Read active interrupt pins
-		uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
+		volatile uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
 		// Clear interrupt pins
+		printf("interrupt status: %i", int_status);
 		mcp_write(MCP_MODE_CMD, CANINTF, 0);
 		// Record interrupt status locally. buffer_wating indicates whether the buffer in question is empty or not.
 		buffer_waiting &= ~int_status;
-		int_trigger = 0;
-		/* if (int_status & (1 << CAN_ERR)) {
+		if (int_status & (1 << CAN_ERR)) {
 			uint8_t errFlag = mcp_read(MCP_MODE_CMD, 0x2d);
+			if (errFlag & (0b111 << 5)) {
+				mcp_write(MCP_MODE_CMD, 0x2d, 0);
+			}
 			printf("Error sending message: %i\n", errFlag);
 			return;
-		} */
+		}
 	}
 }
 
