@@ -73,6 +73,7 @@ int main(void) {
 	char * liststr[4] = { "test1", "test2", "test3", "test4" };
 	ui_list_init(liststr, 4);
 	ui_buttons_init("yes", "no");
+	// ui_draw_big_number(75);
 	
 	process_cycle_clock_init();
 	
@@ -83,8 +84,13 @@ int main(void) {
 	msg.id = 1;
 	msg.data = data;
 	msg.dataLen = 4;
-	flush_buffer();
 	
+	can_msg_t recmsg;
+	recmsg.id = 2;
+	recmsg.data = NULL;
+	
+	flush_buffer();
+	uint8_t score = 0;
 	while (1){
 		if (adc_read){
 			if (read_controller_status(&input)) {
@@ -105,6 +111,14 @@ int main(void) {
 				data[3] = input.slider_two_value;
 				can_send_data(&msg);
 			}
+			
+			if (can_try_receive(&recmsg)) {
+				if (recmsg.id == 2) {
+					score++;
+					printf("Score: %i\n", score);
+				}
+			}
+			
 			adc_read = 0;
 		}
 		_delay_ms(1);

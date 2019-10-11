@@ -21,4 +21,6 @@ void ui_button_trigger(uint8_t button, uint8_t on);
 
 uint8_t get_list_pos();
 
+void ui_draw_big_number(uint8_t num);
+
 #endif /* UI_H_ */

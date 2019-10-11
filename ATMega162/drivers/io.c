@@ -44,16 +44,24 @@ uint8_t read_controller_status(controllerInput *buffer) {
 	} else {
 		buffer->button_two_changed = 0;
 	}
-
+	
+	buffer->joystick_x = get_joystick_value(JOYSTICK_X);
+	buffer->joystick_y = get_joystick_value(JOYSTICK_Y);
+	
 	int joystick_trigger = 0;
 	if (buffer->joystick_y > 40) joystick_trigger = 1;
 	if (buffer->joystick_y < -40) joystick_trigger = -1;
-	if (buffer->joystick_trigger != joystick_trigger && joystick_trigger != 0) {
+	if (buffer->joystick_trigger_last != joystick_trigger && joystick_trigger != 0) {
 		changes = 1;
 		buffer->joystick_trigger = joystick_trigger;
 	} else {
+		if (buffer->joystick_trigger != 0) {
+			changes = 1;
+		}
 		buffer->joystick_trigger = 0;
 	}
+	buffer->joystick_trigger_last = joystick_trigger;
+	
 	uint8_t slider_one = get_slider_value(SLIDER_1);
 	uint8_t slider_two = get_slider_value(SLIDER_2);
 	if (abs(buffer->slider_one_value - slider_one) > 5) {

@@ -19,6 +19,7 @@ typedef struct controllerInput{
 	int8_t joystick_x; // 8
 	int8_t joystick_y; // 8
 	int8_t joystick_trigger; // 8 (for negative values)
+	int8_t joystick_trigger_last;
 
 	uint8_t slider_one_value; // 8
 	uint8_t slider_two_value; // 8

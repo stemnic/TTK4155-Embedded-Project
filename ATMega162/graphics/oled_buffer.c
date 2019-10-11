@@ -125,14 +125,14 @@ void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressing
 	}
 }
 
-void oled_write_large_num (uint8_t row, uint8_t col, uint8_t num, uint8_t addressingMode) {
+void draw_large_num (uint8_t row, uint8_t col, uint8_t num, uint8_t addressingMode) {
 	uint8_t cnt = 0;
 	do {
 		uint8_t digit = num % 10;
 		for (int i = 0; i < 9; i++) {
 			uint16_t val = get_font_dword(digit, i, NUMBERS9x16);
 			draw_data_at(row, (col + i) + 9 * cnt, val & 0xFF, addressingMode);
-			draw_data_at(row, (col + i) + 9 * cnt, (val & 0xFF00) >> 8, addressingMode);
+			draw_data_at(row + 1, (col + i) + 9 * cnt, (val & 0xFF00) >> 8, addressingMode);
 		}
 		num = num / 10;
 		cnt++;

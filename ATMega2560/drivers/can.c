@@ -91,12 +91,12 @@ void can_send_data(can_msg_t *data) {
 
 uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
 	if (!block) {
-		if (PORTD & (1 << PD3)) {
+		if (!(PORTD & (1 << PD2))) {
 			uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
 			mcp_write(MCP_MODE_CMD, CANINTF, 0);
 			buffer_waiting &= ~int_status;
 		}
-		if ((buffer_waiting & (3 << CAN_RX0)) == 3 << CAN_RX0) {
+		if ((buffer_waiting & (3 << CAN_RX0)) == (3 << CAN_RX0)) {
 			return 0;
 		}
 	}
