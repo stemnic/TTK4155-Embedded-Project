@@ -62,7 +62,7 @@ void can_send_data(can_msg_t *data) {
 		buffNum = CAN_TX2;
 		addr = 4;
 	}
-	printf("Send message on buff: %i\n", buffNum);
+	//printf("Send message on buff: %i\n", buffNum);
 	uint8_t raw[13];
 	// Id high/low bits, 11 bit
 	raw[0] = (uint8_t)(data->id >> 3);

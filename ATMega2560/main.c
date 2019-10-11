@@ -6,13 +6,14 @@
  */ 
 
 #include <avr/io.h>
-#define F_CPU 16000000
+#include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdio.h>
 #include "drivers/uart.h"
 #include "drivers/mcp.h"
 #include "drivers/spi.h"
 #include "drivers/can.h"
+#include "drivers/pwm.h"
 
 int main(void)
 {
@@ -23,12 +24,13 @@ int main(void)
 	can_init();
 	
 	can_set_device_mode(CAN_MODE_NORMAL);
+		
     // Replace with your application code 
 	printf("Init Complete\n");
-	uint8_t buffer[3];
+	uint8_t buffer[4];
 	can_msg_t message;
 	message.data = buffer;
-	message.dataLen = 3;
+	message.dataLen = 4;
 	/*while(1) {
 		printf("%i, %i\n", mcp_read(MCP_MODE_CMD, 0x0E), F_CPU);
 		printf("Hei\n");
@@ -53,9 +55,11 @@ int main(void)
 		printf("Can message was sent\n");
 		//_delay_ms(1000);
     }*/
+	pwm_init();
 	while (1) {
 		can_receive_data(&message);
-		printf("x: %i, y: %i, button: %i\n", (int8_t)message.data[0], (int8_t)message.data[1], message.data[2]);
+		printf("x: %i, y: %i, button: %i, slider: %i\n", (int8_t)message.data[0], (int8_t)message.data[1], message.data[2], (uint8_t)message.data[3]);
+		pwm_set_position(message.data[3]);
 	}
 }
 

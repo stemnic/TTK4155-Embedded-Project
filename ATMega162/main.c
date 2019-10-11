@@ -190,11 +190,11 @@ int main(void)
 	
 	can_set_device_mode(CAN_MODE_NORMAL);
 	
-	uint8_t data[3];
+	uint8_t data[4];
 	can_msg_t msg;
 	msg.id = 1;
 	msg.data = data;
-	msg.dataLen = 3;
+	msg.dataLen = 4;
 	
 	while (1){
 		if (adc_read){
@@ -210,9 +210,14 @@ int main(void)
 				ui_list_update(joystick_trigger);
 			}
 			input.joystick_trigger = joystick_trigger;
-			
-			input.slider_one_value = getSliderValue(SLIDER_1);
-			input.slider_two_value = getSliderValue(SLIDER_2);
+			uint8_t slider_one = getSliderValue(SLIDER_1);
+			uint8_t slider_two = getSliderValue(SLIDER_2);
+			if (abs(input.slider_one_value - slider_one) > 5) {
+				input.slider_one_value = slider_one;
+			}
+			if (abs(input.slider_two_value - slider_two) > 5) {
+				input.slider_two_value = slider_two;
+			}
 			
 			if (input.slider_one_button != button_1) {
 				printf("Button 1 trigger\n");
@@ -237,6 +242,7 @@ int main(void)
 			data[0] = input.joystick_x;
 			data[1] = input.joystick_y;
 			data[2] = input.joystick_button;
+			data[3] = input.slider_two_value;
 			can_send_data(&msg);
 		}
 		_delay_ms(1);
