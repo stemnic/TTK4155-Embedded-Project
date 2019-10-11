@@ -40,7 +40,7 @@ void can_init() {
 void wait_for_trigger(uint8_t mask) {
 	while ((buffer_waiting & mask) == mask) {
 		// Wait for interrupt pin to go low
-		while (PORTD & (1 << PD3)) _delay_us(1);
+		while (PIND & (1 << PD3)) _delay_us(1);
 		// Read active interrupt pins
 		volatile uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
 		// Clear interrupt pins
@@ -95,7 +95,7 @@ void can_send_data(can_msg_t *data) {
 
 uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
 	if (!block) {
-		if (!(PORTD & (1 << PD3))) {
+		if (!(PIND & (1 << PD3))) {
 			uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
 			mcp_write(MCP_MODE_CMD, CANINTF, 0);
 			buffer_waiting &= ~int_status;
