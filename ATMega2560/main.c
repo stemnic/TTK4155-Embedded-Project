@@ -57,7 +57,7 @@ int main(void)
     }*/
 	pwm_init();
 	while (1) {
-		can_receive_data(&message);
+		can_receive_blocking(&message);
 		printf("x: %i, y: %i, button: %i, slider: %i\n", (int8_t)message.data[0], (int8_t)message.data[1], message.data[2], (uint8_t)message.data[3]);
 		pwm_set_position(message.data[3]);
 	}

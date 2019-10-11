@@ -31,7 +31,8 @@ typedef struct can_msg {
 void can_set_device_mode(uint8_t mode);
 void can_init();
 void can_send_data(can_msg_t *data);
-void can_receive_data(can_msg_t *data);
+uint8_t can_receive_blocking(can_msg_t *data);
+uint8_t can_try_receive(can_msg_t *data);
 
 
 

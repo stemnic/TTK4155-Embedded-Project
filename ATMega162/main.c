@@ -108,7 +108,7 @@ void exercise5_2() {
 	uint8_t data2[4];
 	msg2.data = data2;
 	msg2.dataLen = 4;
-	can_receive_data(&msg2);
+	can_receive_blocking(&msg2);
 	printf("Receive msg with id: %i, len: %i\n", msg2.id, msg2.dataLen);
 	for (int i = 0; i < msg2.dataLen; i++) {
 		printf("  %i: %i", i, msg2.data[i]);
@@ -128,7 +128,7 @@ void exercise6(){
 	while (1)
 	{
 		printf("Waiting for data from can client\n");
-		can_receive_data(&message);
+		can_receive_blocking(&message);
 		printf("Receive msg with id: %i, len: %i\n", message.id, message.dataLen);
 		for (int i = 0; i < message.dataLen; i++) {
 			printf("  %i: %i", i, message.data[i]);

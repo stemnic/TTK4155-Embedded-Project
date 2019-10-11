@@ -44,11 +44,11 @@ void can_send_data(can_msg_t *data) {
 		mcp_write(MCP_MODE_CMD, CANINTF, 0);
 		buffer_waiting &= ~int_status;
 		int_trigger = 0;
-		if (int_status & (1 << CAN_ERR)) {
+		/* if (int_status & (1 << CAN_ERR)) {
 			uint8_t errFlag = mcp_read(MCP_MODE_CMD, 0x2d);
 			printf("Error sending message: %i\n", errFlag);
 			return;
-		}
+		} */
 	}
 	uint8_t buffNum;
 	uint8_t addr;
@@ -82,7 +82,18 @@ void can_send_data(can_msg_t *data) {
 	buffer_waiting |= 1 << buffNum;
 }
 
-void can_receive_data(can_msg_t *data) {
+uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
+	if (!block) {
+		if (PORTD & (1 << PD3)) {
+			uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
+			mcp_write(MCP_MODE_CMD, CANINTF, 0);
+			buffer_waiting &= ~int_status;
+		}
+		if ((buffer_waiting & (3 << CAN_RX0)) == 3 << CAN_RX0) {
+			return 0;
+		}
+	}
+	
 	while ((buffer_waiting & (3 << CAN_RX0)) == 3 << CAN_RX0) {
 		while (PORTD & (1 << PD3)) _delay_us(1);
 		int_trigger = 0;
@@ -108,6 +119,15 @@ void can_receive_data(can_msg_t *data) {
 	for (int i = 0; i < data->dataLen; i++) {
 		data->data[i] = raw[i+5];
 	}
+	return 1;
+}
+
+uint8_t can_receive_blocking(can_msg_t *data) {
+	return can_receive_data(data, 1);
+}
+
+uint8_t can_try_receive(can_msg_t *data) {
+	return can_receive_data(data, 0);
 }
 
 ISR (INT1_vect) {
