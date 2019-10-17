@@ -15,7 +15,7 @@ uint8_t listLen = 0;
 
 void ui_list_select(int row) {
 	for (int j = 0; j < 12; j++) {
-		draw_data_at(row * 8, j, 0xFF, OLED_ADDR_INVERT);
+		draw_data_at(row * 8, j, 0xFF, 1, OLED_ADDR_INVERT);
 	}
 }
 

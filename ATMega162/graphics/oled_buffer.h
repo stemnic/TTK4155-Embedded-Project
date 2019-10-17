@@ -22,7 +22,7 @@ void flush_buffer();
 
 //64x128 
 void draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8_t addressingMode);
-void draw_data_at(uint8_t row, uint8_t col, uint8_t data, uint8_t addressingMode);
+void draw_data_at(uint8_t row, uint8_t col, uint8_t data, uint8_t len, uint8_t addressingMode);
 void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode);
 void draw_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t width, uint8_t addressingMode);
 void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode);
