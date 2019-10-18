@@ -15,6 +15,7 @@
 #include "drivers/can.h"
 #include "drivers/pwm.h"
 #include "drivers/adc.h"
+#include "drivers/motor.h"
 
 uint16_t score = 0;
 
@@ -72,6 +73,8 @@ int main(void) {
 	solenoid_init();
 	
 	process_cycle_clock_init();
+	
+	motor_init();
 		
     // Replace with your application code 
 	printf("Init Complete\n");
@@ -89,23 +92,42 @@ int main(void) {
 	while (1) {
 		if (timer_int_trigger) {
 			uint8_t ir_trigger = (adc_get_ir_conversion() < 500);
-					
 			if (ir_trigger != previous_ir_trigger) {
 				//printf ("ir trigger: %i\n", ir_trigger);
 				previous_ir_trigger = ir_trigger;
 				if (ir_trigger == 1){
 					can_send_data(&scoremsg);
 					score_add();
-					solenoid_fire();
 				}
 			}
 			timer_int_trigger = 0;
 			solenoid_reset();
+			motor_regulator_tick();
 		}
 		
 		if (can_try_receive(&message)) {
 			if (message.id == 1) {
+				int8_t x_value = (int8_t)message.data[0];
+				int8_t y_value = (int8_t)message.data[1];
+				
+				/*if (abs(x_value) > 0) {
+					if ( x_value > 0) {
+						motor_direction(MOTOR_RIGHT);
+					}
+					else if ( x_value < 0) {
+						motor_direction(MOTOR_LEFT);
+					}
+					motor_value(abs(x_value));
+					printf("Motor value: %i\n", motor_encoder_value());
+				} else {
+					motor_value(0);
+				}*/
+				motor_set_target_pos(message.data[1]);
+				
 				pwm_set_position(message.data[3]);
+				if (message.data[2]){
+					solenoid_fire();
+				}
 			}
 		}
 		//printf("ir trigger: %i\n", ir_trigger);

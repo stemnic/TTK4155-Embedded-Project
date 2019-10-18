@@ -13,7 +13,7 @@ void adc_init(){
 
 	ADMUX = (0x01 << REFS0)   /* AVCC with external capacitor at AREF pin */
 	| (0 << ADLAR)    /* Left Adjust Result: disabled */
-	| (0b00111 << MUX0); /* ADC Single Ended Input pin 15 */
+	| (0x00 << MUX0); /* ADC Single Ended Input pin 0 */
 
 	ADCSRA = (1 << ADEN)        /* ADC: enabled */
 	| (0 << ADATE)     /* Auto Trigger: disabled */
@@ -21,7 +21,7 @@ void adc_init(){
 	| (0b111 << ADPS0); /* 2 */
 	ADCSRB = (0x00 << ADTS0)    /* Free Running mode */
 	| (0 << ACME)      /* Analog Comparator Multiplexer: disabled */
-	| (1 << MUX5)
+	| (0 << MUX5)
 	;
 
 	DIDR2 = 1 << ADC15D; /* Disable digital input buffer for ADC15 */

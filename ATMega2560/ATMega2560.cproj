@@ -57,6 +57,19 @@
     </com_atmel_avrdbg_tool_atmelice>
     <avrtoolinterface>JTAG</avrtoolinterface>
     <avrtoolinterfaceclock>200000</avrtoolinterfaceclock>
+    <custom>
+      <ToolOptions>
+        <InterfaceProperties>
+          <JtagDbgClock>200000</JtagDbgClock>
+        </InterfaceProperties>
+        <InterfaceName>
+        </InterfaceName>
+      </ToolOptions>
+      <ToolType>custom</ToolType>
+      <ToolNumber>
+      </ToolNumber>
+      <ToolName>Custom Programming Tool</ToolName>
+    </custom>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -158,6 +171,12 @@
     <Compile Include="drivers\mcp.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="drivers\motor.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="drivers\motor.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="drivers\pwm.c">
       <SubType>compile</SubType>
     </Compile>
@@ -168,6 +187,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="drivers\spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="drivers\TWI_Master.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="drivers\TWI_Master.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="drivers\uart.c">
