@@ -17,6 +17,8 @@ uint8_t buffer_waiting = 3 << CAN_RX0;
 #define CANINTE 0x2B
 
 #define CANINTF 0x2C
+#define CANCTRL 0x0F
+#define OSM 3
 #define CAN_ERR 5
 
 void can_set_device_mode(uint8_t mode) {
@@ -32,6 +34,7 @@ void can_init() {
 	//EIMSK |= (1<<INT2);
 	//EICRA |= (0b10 << 4);
 	// Enable all messages on all buffers
+	mcp_bit_modify(1 << OSM, CANCTRL, 0 << OSM);
 	mcp_write(MCP_MODE_CMD, 0x60, 0x60);
 	mcp_write(MCP_MODE_CMD, 0x70, 0x60);
 	mcp_write(MCP_MODE_CMD, CANINTF, 0);
