@@ -8,6 +8,7 @@
 #include "../drivers/oled.h"
 #include "oled_buffer.h"
 #include <stdlib.h>
+#include <stdio.h>
 volatile char* ext_ram = (char *) 0x1800;
 
 int changed = 1;
@@ -32,29 +33,34 @@ void flush_buffer() {
 	}
 }
 
+
 void draw_data_at(uint8_t row, uint8_t col, uint8_t data, uint8_t len, uint8_t addresingMode) {
+	if (row > 63 || col > 127) {
+		printf("Out of range: %i, %i\n", row, col);
+		return;
+	}
 	changed = 1;
-	uint8_t addr1 = (((row / 8) << 7) + col) << 1;
-	uint8_t addr2 = ((((row / 8) + 1) << 7) + col) << 1;
+	uint16_t addr1 = ((((row / 8) << 7) + col) << 1);
+	uint16_t addr2 = ((((row / 8) + 1) << 7) + col) << 1;
 	uint8_t offset = row % 8;
-	uint8_t mask = 0xFF >> offset;
+	uint8_t mask = 0xFF << offset;
 	switch(addresingMode) {
 	case OLED_ADDR_OVERWRITE:
 		// Clear bits to be modified, then set with or
-		ext_ram[addr1] = (ext_ram[addr1] & ~mask) | (data >> offset);
-		if (offset && len > (8 - offset)) ext_ram[addr2] = (ext_ram[addr2] & mask) | (data << (8 - offset));
+		ext_ram[addr1] = (ext_ram[addr1] & ~mask) | (data << offset);
+		if (offset && len > (8 - offset) && row < 63) ext_ram[addr2] = (ext_ram[addr2] & mask) | (data >> (8 - offset));
 		break;
 	case OLED_ADDR_LAYER:
-		ext_ram[addr1] |= (data >> offset);
-		if (offset && len > (8 - offset)) ext_ram[addr2] |= (data << (8 - offset));
+		ext_ram[addr1] |= (data << offset);
+		if (offset && len > (8 - offset) && row < 63) ext_ram[addr2] |= (data >> (8 - offset));
 		break;
 	case OLED_ADDR_DISABLE:
-		ext_ram[addr1] &= ~(data >> offset);
-		if (offset && len > (8 - offset)) ext_ram[addr2] &= ~(data << (8 - offset));
+		ext_ram[addr1] &= ~(data << offset);
+		if (offset && len > (8 - offset) && row < 63) ext_ram[addr2] &= ~(data >> (8 - offset));
 		break;
 	case OLED_ADDR_INVERT:
-		ext_ram[addr1] ^= (data >> offset);
-		if (offset && len > (8 - offset)) ext_ram[addr2] ^= (data << (8 - offset));
+		ext_ram[addr1] ^= (data << offset);
+		if (offset && len > (8 - offset) && row < 63) ext_ram[addr2] ^= (data >> (8 - offset));
 	}
 }
 
@@ -78,7 +84,7 @@ void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressin
 	int16_t sx = x0 < x1 ? 1 : -1;
 	int16_t sy = y0 < y1 ? 1 : -1;
 	while (1) {
-		draw_data_at(x0, y0, 1 << 7, 1, addressingMode);
+		draw_data_at(x0, y0, 1, 1, addressingMode);
 		if (x0 == x1 && y0 == y1) break;
 		int16_t e2 = err*2;
 		if (e2 >= dy) {
@@ -116,7 +122,7 @@ void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressing
 	while (dx > 0) {
 		uint8_t len = dx < 8 ? dx : 8;
 		for (int y = y0; y <= y1; y += sy) {
-			draw_data_at(x, y, 0xFF << (8 - len), len, addressingMode);
+			draw_data_at(x, y, 0xFF << (8 - len - 1), len, addressingMode);
 		}
 		dx -= len;
 		x += sx;

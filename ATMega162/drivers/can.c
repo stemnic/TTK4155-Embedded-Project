@@ -16,10 +16,12 @@ uint8_t buffer_waiting = 3 << CAN_RX0;
 #define CANINTE 0x2B
 
 #define CANINTF 0x2C
+#define CANCTRL 0x0F
+#define OSM 3
 #define CAN_ERR 7
 
 void can_set_device_mode(uint8_t mode) {
-	mcp_bit_modify(0xE0, 0x0F, mode << 5);
+	mcp_bit_modify(0xE0, CANCTRL, mode << 5);
 }
 
 void can_init() {
@@ -32,6 +34,7 @@ void can_init() {
 	//MCUCR |= (0b10 << 2);
 	
 	// Enable all messages on all buffers
+	mcp_bit_modify(1 << OSM, CANCTRL, 0 << OSM);
 	mcp_write(MCP_MODE_CMD, 0x60, 0x60);
 	mcp_write(MCP_MODE_CMD, 0x70, 0x60);
 	mcp_write(MCP_MODE_CMD, CANINTF, 0);
@@ -62,7 +65,7 @@ void wait_for_trigger(uint8_t mask) {
 
 void can_send_data(can_msg_t *data) {
 	wait_for_trigger(7 << CAN_TX0);
-	
+	//printf("Send data\n");
 	uint8_t buffNum;
 	uint8_t addr;
 	if (!(buffer_waiting & (1 << CAN_TX0))) {
@@ -104,9 +107,10 @@ uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
 		if ((buffer_waiting & (3 << CAN_RX0)) == (3 << CAN_RX0)) {
 			return 0;
 		}
+	} else {
+		wait_for_trigger(3 << CAN_RX0);
 	}
 	
-	wait_for_trigger(3 << CAN_RX0);
 
 	uint8_t buffNum;
 	uint8_t addr;

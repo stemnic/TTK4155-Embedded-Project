@@ -17,7 +17,7 @@ uint8_t buffer_waiting = 3 << CAN_RX0;
 #define CANINTE 0x2B
 
 #define CANINTF 0x2C
-#define CAN_ERR 7
+#define CAN_ERR 5
 
 void can_set_device_mode(uint8_t mode) {
 	mcp_bit_modify(0xE0, 0x0F, mode << 5);
@@ -103,9 +103,9 @@ uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
 		if ((buffer_waiting & (3 << CAN_RX0)) == (3 << CAN_RX0)) {
 			return 0;
 		}
+	} else {
+		wait_for_trigger(3 << CAN_RX0);
 	}
-	
-	wait_for_trigger(3 << CAN_RX0);
 
 	uint8_t buffNum;
 	uint8_t addr;
