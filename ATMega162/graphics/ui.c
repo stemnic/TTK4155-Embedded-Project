@@ -7,6 +7,7 @@
 
 #include "oled_buffer.h"
 #include "ui.h"
+#include "simulator.h"
 #include "../drivers/io.h"
 #include "../drivers/oled.h"
 
@@ -21,7 +22,7 @@ void ui_list_select(int row) {
 
 void ui_list_init(char** options, uint8_t len) {
 	for (int i = 0; i < len; i++) {
-		draw_string_at(i*8+2, 0, options[i], FONT8x8, OLED_ADDR_LAYER);
+		draw_string_at(i*8, 0, options[i], FONT8x8, OLED_ADDR_LAYER);
 	}
 	listLen = len;
 	listSel = 0;
@@ -59,4 +60,24 @@ uint8_t get_list_pos() {
 
 void ui_draw_big_number(uint8_t num) {
 	draw_large_num(16, 90, num, OLED_ADDR_LAYER);
+}
+
+void ui_menu_update(controllerInput *_input) {
+	controllerInput input = *(_input);
+	ui_list_update(input.joystick_trigger);
+	if (input.button_one_changed) {
+		ui_button_trigger(BUTTON_1, input.button_one_value);
+	}
+	if (input.button_two_changed) {
+		ui_button_trigger(BUTTON_2, input.button_two_value);
+	}
+}
+
+void ui_simulator_update(controllerInput *_input, uint8_t pos) {
+	controllerInput input = *(_input);
+	sim_update_actor_angle(255 - input.slider_two_value);
+	if (input.joystick_button_changed && input.joystick_button) {
+		sim_trigger_solenoid();
+	}
+	sim_update_pos(pos / 2.8 + 20);
 }

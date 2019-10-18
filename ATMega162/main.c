@@ -19,6 +19,13 @@
 #include "drivers/can.h"
 #include "graphics/oled_buffer.h"
 #include "graphics/ui.h"
+#include "graphics/simulator.h"
+
+#define UI_MENU_MAIN 5
+#define UI_MENU_SIM 0
+#define UI_MENU_RUN 1
+#define MOTOR_SPD_SCALE 15
+
 
 void exercise6() {
 	can_set_device_mode(CAN_MODE_NORMAL);
@@ -50,6 +57,24 @@ void process_cycle_clock_init() {
 	TIMSK |= (1 << 1); // Overflow interrupt enable
 }
 
+double motor_pos = 127;
+
+uint8_t get_motor_pos(controllerInput* input) {
+	uint8_t conv_motor_pos = 0;
+	motor_pos += ((double)input->joystick_x) / MOTOR_SPD_SCALE;
+
+	if (motor_pos > 255) {
+		motor_pos = 255;
+		conv_motor_pos = 255;
+	} else if (motor_pos < 0) {
+		motor_pos = 0;
+		conv_motor_pos = 0;
+	} else {
+		conv_motor_pos = (uint8_t)motor_pos;
+	}
+	return conv_motor_pos;
+}
+
 controllerInput input;
 uint8_t adc_read = 0;
 
@@ -70,55 +95,94 @@ int main(void) {
 	can_init();
 	
 	wipe_buffer();
-	char * liststr[4] = { "test1", "test2", "test3", "test4" };
+	char * liststr[4] = { "Simulator", "Play", "test3", "test4" };
+
 	ui_list_init(liststr, 4);
 	ui_buttons_init("yes", "no");
-	// ui_draw_big_number(75);
 	
 	process_cycle_clock_init();
 	
 	can_set_device_mode(CAN_MODE_NORMAL);
 	
-	uint8_t data[4];
+	uint8_t data[6];
 	can_msg_t msg;
 	msg.id = 1;
 	msg.data = data;
-	msg.dataLen = 4;
+	msg.dataLen = 6;
 	
 	can_msg_t recmsg;
 	recmsg.id = 2;
 	recmsg.data = NULL;
 	
+	uint8_t ui_menu = UI_MENU_MAIN;
+
 	flush_buffer();
 	uint8_t score = 0;
-	while (1){
-		if (adc_read){
-			if (read_controller_status(&input)) {
-				ui_list_update(input.joystick_trigger);
-				if (input.button_one_changed) {
-					ui_button_trigger(BUTTON_1, input.button_one_value);
-				}
-				if (input.button_two_changed) {
-					ui_button_trigger(BUTTON_2, input.button_two_value);
-				}
-				if (input.joystick_button_changed && input.joystick_button) {
-					printf("%s\n", liststr[get_list_pos()]);
-				}
-				flush_buffer();
-				data[0] = input.joystick_x;
-				data[1] = input.joystick_y;
-				data[2] = input.joystick_button;
-				data[3] = input.slider_two_value;
-				can_send_data(&msg);
+
+
+	uint8_t changes;
+	while (1) {
+		if (adc_read) {
+			changes = read_controller_status(&input);
+			switch(ui_menu) {
+				case UI_MENU_MAIN:
+					if (changes) ui_menu_update(&input);
+					if (input.joystick_button_changed && input.joystick_button) {
+						uint8_t next = get_list_pos();
+						if (next == UI_MENU_SIM || next == UI_MENU_RUN) {
+							ui_menu = next;
+							wipe_buffer();
+						}
+					}
+					break;
+				case UI_MENU_SIM:
+					if (changes || input.joystick_x) {
+						uint8_t conv_motor_pos = get_motor_pos(&input);
+						ui_simulator_update(&input, conv_motor_pos);
+					}
+					sim_tick();
+					if (input.button_one_changed && input.button_one_value) {
+						ui_menu = UI_MENU_MAIN;
+						wipe_buffer();
+						ui_list_init(liststr, 4);
+						ui_buttons_init("yes", "no");
+					}
+					break;
+				case UI_MENU_RUN:
+					sim_tick();
+					if (input.button_one_changed && input.button_one_value) {
+						ui_menu = UI_MENU_MAIN;
+						wipe_buffer();
+						ui_list_init(liststr, 4);
+						ui_buttons_init("yes", "no");
+						data[0] = 0;
+						data[1] = 127;
+						data[2] = 0;
+						data[3] = 127;
+						data[4] = 1;
+						data[5] = 0;
+						can_send_data(&msg);
+					} else if (changes || input.joystick_x) {
+						uint8_t conv_motor_pos = get_motor_pos(&input);
+						ui_simulator_update(&input, conv_motor_pos);
+						data[0] = input.joystick_x;
+						data[1] = conv_motor_pos;
+						data[2] = input.joystick_button;
+						data[3] = input.slider_two_value;
+						data[4] = input.button_one_changed && input.button_one_value;
+						data[5] = input.button_two_changed && input.button_two_value;
+						can_send_data(&msg);
+					}
 			}
-			
+
+
 			if (can_try_receive(&recmsg)) {
 				if (recmsg.id == 2) {
 					score++;
 					printf("Score: %i\n", score);
 				}
 			}
-			
+			flush_buffer();
 			adc_read = 0;
 		}
 		_delay_ms(1);

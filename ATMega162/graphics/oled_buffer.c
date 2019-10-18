@@ -9,6 +9,7 @@
 #include "oled_buffer.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 volatile char* ext_ram = (char *) 0x1800;
 
 int changed = 1;
@@ -24,6 +25,8 @@ void wipe_buffer() {
 
 void flush_buffer() {
 	if (!changed) return;
+	oled_command(PAGE_LOW_COL_START);
+	oled_command(PAGE_HIGH_COL_START);
 	for (uint8_t i = 0; i < 8; i++) {
 		oled_command(PAGE_START_ADDR_PAGE_BASE + i);
 		for (uint8_t j = 0; j < 128; j++) {
@@ -36,7 +39,6 @@ void flush_buffer() {
 
 void draw_data_at(uint8_t row, uint8_t col, uint8_t data, uint8_t len, uint8_t addresingMode) {
 	if (row > 63 || col > 127) {
-		printf("Out of range: %i, %i\n", row, col);
 		return;
 	}
 	changed = 1;
@@ -77,6 +79,10 @@ void draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8
 	}
 }
 
+void draw_point_at(uint8_t row, uint8_t col, uint8_t addressingMode) {
+	draw_data_at(row, col, 1, 1, addressingMode);
+}
+
 void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode) {
 	int16_t dx = abs(((int16_t)x1) - ((int16_t)x0));
 	int16_t dy = -abs(((int16_t)y1) - ((int16_t)y0));
@@ -84,7 +90,7 @@ void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressin
 	int16_t sx = x0 < x1 ? 1 : -1;
 	int16_t sy = y0 < y1 ? 1 : -1;
 	while (1) {
-		draw_data_at(x0, y0, 1, 1, addressingMode);
+		draw_point_at(x0, y0, addressingMode);
 		if (x0 == x1 && y0 == y1) break;
 		int16_t e2 = err*2;
 		if (e2 >= dy) {
@@ -129,16 +135,90 @@ void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressing
 	}
 }
 
+void draw_rotated_box(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, int16_t angle, uint8_t ends, uint8_t sides, uint8_t shift, uint8_t addressingMode) {
+	double rads = ((double)angle) / 512.0 * 2.0 * 22/7;
+	double ax = cos(rads);
+	double ay = -sin(rads);
+	uint8_t x00 = x0 + ax*width/2 + ay*shift;
+	uint8_t y00 = y0 - ay*width/2 + ax*shift;
+	uint8_t x01 = x0 - ax*width/2 + ay*shift;
+	uint8_t y01 = y0 + ay*width/2 + ax*shift;
+	uint8_t x10 = x00 + ay*height;
+	uint8_t y10 = y00 + ax*height;
+
+	uint8_t x11 = x01 + ay*height;
+	uint8_t y11 = y01 + ax*height;
+	if (sides) {
+		draw_line(x00, y00, x01, y01, addressingMode);
+		draw_line(x11, y11, x10, y10, addressingMode);
+	}
+	if (ends) {
+		draw_line(x01, y01, x11, y11, addressingMode);
+		draw_line(x10, y10, x00, y00, addressingMode);
+	}
+}
+
 void draw_large_num (uint8_t row, uint8_t col, uint8_t num, uint8_t addressingMode) {
 	uint8_t cnt = 0;
+	uint8_t len = log10(num) + 1;
 	do {
 		uint8_t digit = num % 10;
 		for (int i = 0; i < 9; i++) {
 			uint16_t val = get_font_dword(digit, i, NUMBERS9x16);
-			draw_data_at(row, (col + i) + 9 * cnt, val & 0xFF, 8, addressingMode);
-			draw_data_at(row + 1, (col + i) + 9 * cnt, (val & 0xFF00) >> 8, 8, addressingMode);
+			draw_data_at(row, (col + i) + 9 * (len - cnt), val & 0xFF, 8, addressingMode);
+			draw_data_at(row + 8, (col + i) + 9 * (len - cnt), (val & 0xFF00) >> 8, 8, addressingMode);
 		}
 		num = num / 10;
 		cnt++;
 	} while (num > 0);
+}
+
+void draw_circle(uint8_t x0, uint8_t y0, uint8_t rad, uint8_t fill, uint8_t addressingMode) {
+	int16_t x = rad, y = 0;
+	int16_t p = 1 - rad;
+
+	if (fill && rad > 0) {
+		draw_line(x + x0, y + y0, -x + x0, y + y0, addressingMode);
+		draw_line(y + x0, x + y0, y + x0, -x + y0, addressingMode);
+	}
+	else {
+		draw_point_at(x + x0, y + y0, addressingMode);
+		if (rad > 0) {
+			draw_point_at(-x + x0, y + y0, addressingMode);
+			draw_point_at(y + x0, -x + y0, addressingMode);
+			draw_point_at(y + x0, x + y0, addressingMode);
+		}
+	} 
+
+
+	while (x > y) {
+		y++;
+		if (p <= 0) {
+			p += 2 * y + 1;
+		} else {
+			x--;
+			p += 2 * y - 2 * x + 1;
+		}
+		if (x < y) break;
+
+		if (fill) {
+			draw_line(-x + x0, y + y0, x + x0, y + y0, addressingMode);
+			draw_line(-x + x0, -y + y0, x + x0, -y + y0, addressingMode);
+			if (x != y) {
+				draw_line(y + x0, x + y0, -y + x0, x + y0, addressingMode);
+				draw_line(y + x0, -x + y0, -y + x0, -x + y0, addressingMode);
+			}
+		} else {
+			draw_point_at(x + x0, y + y0, addressingMode);
+			draw_point_at(-x + x0, y + y0, addressingMode);
+			draw_point_at(x + x0, -y + y0, addressingMode);
+			draw_point_at(-x + x0, -y + y0, addressingMode);
+			if (x != y) {
+				draw_point_at(y + x0, x + y0, addressingMode);
+				draw_point_at(-y + x0, x + y0, addressingMode);
+				draw_point_at(y + x0, -x + y0, addressingMode);
+				draw_point_at(-y + x0, -x + y0, addressingMode);
+			}
+		}
+	}
 }

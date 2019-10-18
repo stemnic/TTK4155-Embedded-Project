@@ -48,7 +48,7 @@ void wait_for_trigger(uint8_t mask) {
 		volatile uint8_t int_status = mcp_read(MCP_MODE_CMD, CANINTF);
 		// Clear interrupt pins
 		mcp_bit_modify(int_status, CANINTF, 0);
-		mcp_write(MCP_MODE_CMD, CANINTF, 0);
+		//mcp_write(MCP_MODE_CMD, CANINTF, 0);
 		// Record interrupt status locally. buffer_wating indicates whether the buffer in question is empty or not.
 		buffer_waiting &= ~int_status;
 		int_trigger = 0;

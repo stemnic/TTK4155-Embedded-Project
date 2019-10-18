@@ -45,8 +45,17 @@ uint8_t read_controller_status(controllerInput *buffer) {
 		buffer->button_two_changed = 0;
 	}
 	
-	buffer->joystick_x = get_joystick_value(JOYSTICK_X);
-	buffer->joystick_y = get_joystick_value(JOYSTICK_Y);
+	int8_t joystick_x = get_joystick_value(JOYSTICK_X);
+	if (joystick_x != buffer->joystick_x) {
+		changes = 1;
+		buffer->joystick_x = joystick_x;
+	}
+
+	int8_t joystick_y = get_joystick_value(JOYSTICK_Y);
+	if (joystick_y != buffer->joystick_y) {
+		changes = 1;
+		buffer->joystick_y = joystick_y;
+	}
 	
 	int joystick_trigger = 0;
 	if (buffer->joystick_y > 40) joystick_trigger = 1;

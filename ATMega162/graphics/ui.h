@@ -9,6 +9,8 @@
 #ifndef UI_H_
 #define UI_H_
 
+#include "../drivers/io.h"
+
 void ui_list_select(int row);
 
 void ui_list_init(char** options, uint8_t len);
@@ -22,5 +24,9 @@ void ui_button_trigger(uint8_t button, uint8_t on);
 uint8_t get_list_pos();
 
 void ui_draw_big_number(uint8_t num);
+
+void ui_menu_update(controllerInput *_input);
+
+void ui_simulator_update(controllerInput *_input, uint8_t pos);
 
 #endif /* UI_H_ */
