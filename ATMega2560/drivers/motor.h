@@ -28,7 +28,7 @@ void motor_value(uint8_t value);
 
 void motor_direction(uint8_t dir);
 
-int16_t motor_encoder_value();
+uint16_t motor_encoder_value();
 
 void motor_regulator_tick();
 
