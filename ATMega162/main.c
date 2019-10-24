@@ -21,9 +21,7 @@
 #include "graphics/ui.h"
 #include "graphics/simulator.h"
 
-#define UI_MENU_MAIN 5
-#define UI_MENU_SIM 0
-#define UI_MENU_RUN 1
+
 #define MOTOR_SPD_SCALE 15
 
 
@@ -132,6 +130,7 @@ int main(void) {
 						if (next == UI_MENU_SIM || next == UI_MENU_RUN) {
 							ui_menu = next;
 							wipe_buffer();
+							sim_init(next == UI_MENU_SIM ? SIM_MODE_SIMULATOR : SIM_MODE_RUN);
 						}
 					}
 					break;

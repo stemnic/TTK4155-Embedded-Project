@@ -136,9 +136,9 @@ void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressing
 }
 
 void draw_rotated_box(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, int16_t angle, uint8_t ends, uint8_t sides, uint8_t shift, uint8_t addressingMode) {
-	double rads = ((double)angle) / 512.0 * 2.0 * 22/7;
-	double ax = cos(rads);
-	double ay = -sin(rads);
+	float rads = ((float)angle) / 512.0 * 2.0 * 22/7;
+	float ax = cos(rads);
+	float ay = -sin(rads);
 	uint8_t x00 = x0 + ax*width/2 + ay*shift;
 	uint8_t y00 = y0 - ay*width/2 + ax*shift;
 	uint8_t x01 = x0 - ax*width/2 + ay*shift;

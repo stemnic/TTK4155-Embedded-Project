@@ -9,6 +9,10 @@
 #ifndef UI_H_
 #define UI_H_
 
+#define UI_MENU_MAIN 5
+#define UI_MENU_SIM 0
+#define UI_MENU_RUN 1
+
 #include "../drivers/io.h"
 
 void ui_list_select(int row);

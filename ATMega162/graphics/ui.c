@@ -73,6 +73,10 @@ void ui_menu_update(controllerInput *_input) {
 	}
 }
 
+void ui_simulator_init(uint8_t mode) {
+	
+}
+
 void ui_simulator_update(controllerInput *_input, uint8_t pos) {
 	controllerInput input = *(_input);
 	sim_update_actor_angle(255 - input.slider_two_value);
