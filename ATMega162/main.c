@@ -24,32 +24,6 @@
 
 #define MOTOR_SPD_SCALE 15
 
-
-void exercise6() {
-	can_set_device_mode(CAN_MODE_NORMAL);
-	uint8_t buffer[4] = { 1, 2, 3, 4 };
-	can_msg_t message;
-	message.data = buffer;
-	message.dataLen = 4;
-	message.id = 0x1ff;
-	printf("Sending test CAN Data\n");
-	can_send_data(&message);
-	while (1)
-	{
-		printf("Waiting for data from can client\n");
-		can_receive_blocking(&message);
-		printf("Receive msg with id: %i, len: %i\n", message.id, message.dataLen);
-		for (int i = 0; i < message.dataLen; i++) {
-			printf("  %i: %i", i, message.data[i]);
-		}
-		printf("\n");
-		message.data[0]++;
-		can_send_data(&message);
-		printf("Can message was sent\n");
-		_delay_ms(1000);
-	}
-}
-
 void process_cycle_clock_init() {
 	TCCR0 |= (0b100 << 0); // clk/256 will interrupt at an interval of 13ms
 	TIMSK |= (1 << 1); // Overflow interrupt enable
@@ -59,7 +33,7 @@ double motor_pos = 127;
 
 uint8_t get_motor_pos(controllerInput* input) {
 	uint8_t conv_motor_pos = 0;
-	motor_pos += ((double)input->joystick_x) / MOTOR_SPD_SCALE;
+	motor_pos += ((float)input->joystick_x) / MOTOR_SPD_SCALE;
 
 	if (motor_pos > 255) {
 		motor_pos = 255;
@@ -86,7 +60,7 @@ int main(void) {
 	//fdevopen(oled_write_char,uart_receive_char);
 	
 	SRAM_init();
-	SRAM_test();
+	//SRAM_test();
 	ADC_init();
 	oled_init();
 	spi_init();

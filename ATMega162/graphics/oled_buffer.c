@@ -160,7 +160,7 @@ void draw_rotated_box(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, int
 
 void draw_large_num (uint8_t row, uint8_t col, uint8_t num, uint8_t addressingMode) {
 	uint8_t cnt = 0;
-	uint8_t len = log10(num) + 1;
+	uint8_t len = num == 0 ? 1 : log10(num) + 1;
 	do {
 		uint8_t digit = num % 10;
 		for (int i = 0; i < 9; i++) {

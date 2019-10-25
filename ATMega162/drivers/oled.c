@@ -57,80 +57,14 @@ void oled_clear(){
 	currentCol = 0;
 }
 
-void oled_write_char_internal (char chr, int fontSize){
-	if (chr == '\n') {
-		if (++currentPage > 7){
-			currentPage = 0;
-		}
-		if (currentCol < 128) {
-			for (;currentCol < 128; currentCol++) {
-				oled_data[0] = 0x00;
-			}
-		}
-		oled_command(PAGE_START_ADDR_PAGE_BASE + currentPage);
-		currentCol = 0;
-		//oled_Command(RESET_PAGE_COLUMN);
-		return;
-	}else if(currentCol == 128) {
-		if (++currentPage > 7){
-			currentPage = 0;
-		}
-		oled_command(PAGE_START_ADDR_PAGE_BASE + currentPage);
-		currentCol = 0;
-	}
-	for (int col=0; col < fontSize; col++){
-		switch(fontSize) {
-			case FONT8x8:
-			oled_data[0] =  pgm_read_byte(&(font8[chr-32][col]));
-			break;
-			case FONT5x7:
-			oled_data[0] =  pgm_read_byte(&(font5[chr-32][col]));
-			break;
-			case FONT4x6:
-			oled_data[0] =  pgm_read_byte(&(font4[chr-32][col]));
-			break;
-			default:
-			return;
-		}
-		currentCol++;
-	}
-}
-
-void oled_write_char (char chr){
-	oled_write_char_internal(chr, FONT8x8);
-}
-
-void oled_write_string (char *chr_ptr, int fontSize){
-	for (int num = 0; chr_ptr[num] != '\0'; num++) {
-		if (chr_ptr[num] == '\n') {
-			if (++currentPage > 7){
-				currentPage = 0;
-			}
-			if (currentCol < 128) {
-				for (;currentCol < 128; currentCol++) {
-					oled_data[0] = 0x00;
-				}
-			}
-			oled_command(PAGE_START_ADDR_PAGE_BASE + currentPage);
-			currentCol = 0;
-			//oled_Command(RESET_PAGE_COLUMN);
-			continue;
-		}
-		for (int col=0; col < fontSize; col++){
-			oled_data[0] = get_font_byte(chr_ptr[num], col, fontSize);
-			currentCol++;
-		}
-	}
-}
-
 uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize) {
 	switch (fontSize) {
 		case FONT8x8:
 			return pgm_read_byte(&(font8[in - 32][col]));
 		case FONT5x7:
-			return pgm_read_byte(&(font5[in - 32][col]));
+			return pgm_read_byte(&(font8[in - 32][col]));
 		case FONT4x6:
-			return pgm_read_byte(&(font4[in - 32][col]));
+			return pgm_read_byte(&(font8[in - 32][col]));
 		default:
 			return 0;
 	}
