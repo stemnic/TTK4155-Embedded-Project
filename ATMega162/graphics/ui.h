@@ -33,4 +33,8 @@ void ui_menu_update(controllerInput *_input);
 
 void ui_simulator_update(controllerInput *_input, uint8_t pos);
 
+void ui_menu_init(char **list, uint8_t len);
+
+void ui_menu_tick();
+
 #endif /* UI_H_ */

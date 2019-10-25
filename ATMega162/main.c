@@ -67,10 +67,9 @@ int main(void) {
 	can_init();
 	
 	wipe_buffer();
-	char * liststr[4] = { "Simulator", "Play", "test3", "test4" };
+	char * liststr[4] = { "Simulate", "Play" };
 
-	ui_list_init(liststr, 4);
-	ui_buttons_init("yes", "no");
+	ui_menu_init(liststr, 2);
 	
 	process_cycle_clock_init();
 	
@@ -98,6 +97,7 @@ int main(void) {
 			changes = read_controller_status(&input);
 			switch(ui_menu) {
 				case UI_MENU_MAIN:
+					ui_menu_tick();
 					if (changes) ui_menu_update(&input);
 					if (input.joystick_button_changed && input.joystick_button) {
 						uint8_t next = get_list_pos();
@@ -117,8 +117,7 @@ int main(void) {
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
-						ui_list_init(liststr, 4);
-						ui_buttons_init("yes", "no");
+						ui_menu_init(liststr, 2);
 					}
 					break;
 				case UI_MENU_RUN:
@@ -126,8 +125,7 @@ int main(void) {
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
-						ui_list_init(liststr, 4);
-						ui_buttons_init("yes", "no");
+						ui_menu_init(liststr, 2);
 						data[0] = 0;
 						data[1] = 127;
 						data[2] = 0;
@@ -139,7 +137,7 @@ int main(void) {
 						uint8_t conv_motor_pos = get_motor_pos(&input);
 						ui_simulator_update(&input, conv_motor_pos);
 						data[0] = input.joystick_x;
-						data[1] = conv_motor_pos;
+						data[1] = 255 - conv_motor_pos;
 						data[2] = input.joystick_button;
 						data[3] = input.slider_two_value;
 						data[4] = input.button_one_changed && input.button_one_value;

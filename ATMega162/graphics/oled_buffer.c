@@ -7,6 +7,7 @@
 #include <avr/io.h>
 #include "../drivers/oled.h"
 #include "oled_buffer.h"
+#include "geometry.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -136,25 +137,14 @@ void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressing
 }
 
 void draw_rotated_box(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, int16_t angle, uint8_t ends, uint8_t sides, uint8_t shift, uint8_t addressingMode) {
-	float rads = ((float)angle) / 512.0 * 2.0 * 22/7;
-	float ax = cos(rads);
-	float ay = -sin(rads);
-	uint8_t x00 = x0 + ax*width/2 + ay*shift;
-	uint8_t y00 = y0 - ay*width/2 + ax*shift;
-	uint8_t x01 = x0 - ax*width/2 + ay*shift;
-	uint8_t y01 = y0 + ay*width/2 + ax*shift;
-	uint8_t x10 = x00 + ay*height;
-	uint8_t y10 = y00 + ax*height;
-
-	uint8_t x11 = x01 + ay*height;
-	uint8_t y11 = y01 + ax*height;
+	rectangle rect = geo_build_rect(x0, y0, width, height, angle, shift);
 	if (sides) {
-		draw_line(x00, y00, x01, y01, addressingMode);
-		draw_line(x11, y11, x10, y10, addressingMode);
+		draw_line(rect.ax, rect.ay, rect.bx, rect.by, addressingMode);
+		draw_line(rect.dx, rect.dy, rect.cx, rect.cy, addressingMode);
 	}
 	if (ends) {
-		draw_line(x01, y01, x11, y11, addressingMode);
-		draw_line(x10, y10, x00, y00, addressingMode);
+		draw_line(rect.bx, rect.by, rect.cx, rect.cy, addressingMode);
+		draw_line(rect.dx, rect.dy, rect.ax, rect.ay, addressingMode);
 	}
 }
 
@@ -218,6 +208,18 @@ void draw_circle(uint8_t x0, uint8_t y0, uint8_t rad, uint8_t fill, uint8_t addr
 				draw_point_at(-y + x0, x + y0, addressingMode);
 				draw_point_at(y + x0, -x + y0, addressingMode);
 				draw_point_at(-y + x0, -x + y0, addressingMode);
+			}
+		}
+	}
+}
+
+void draw_image_at(uint8_t x0, uint8_t y0, uint8_t img, uint8_t flip, uint8_t dimx, uint8_t dimy, uint8_t addressingMode) {
+	for (int i = 0; i < dimy/8; i++) {
+		for (int j = 0; j < dimx; j++) {
+			if (flip) {
+				draw_data_at(i*8 + y0, j + x0, get_img_byte(img, dimx - j - 1, dimy/8 - i - 1), 8, addressingMode);
+			} else {
+				draw_data_at(i*8 + y0, j + x0, get_img_byte(img, j, dimy/8 - i - 1), 8, addressingMode);
 			}
 		}
 	}

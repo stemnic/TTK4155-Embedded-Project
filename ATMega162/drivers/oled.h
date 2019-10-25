@@ -26,6 +26,7 @@
 #define FONT5x7 5
 #define FONT4x6 4
 #define NUMBERS9x16 9
+#define RACKET 0
 
 
 void oled_init();
@@ -36,7 +37,7 @@ void oled_command(uint8_t command);
 void oled_write_byte(uint8_t data);
 uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize);
 uint16_t get_font_dword(int index, uint8_t col, uint8_t img);
-
+uint8_t get_img_byte(uint8_t img, uint8_t row, uint8_t col);
 
 
 #endif /* OLED_H_ */

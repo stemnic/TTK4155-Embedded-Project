@@ -30,7 +30,7 @@ void draw_large_num (uint8_t row, uint8_t col, uint8_t num, uint8_t addressingMo
 void draw_circle(uint8_t x0, uint8_t y0, uint8_t rad, uint8_t fill, uint8_t addressingMode);
 void draw_point_at(uint8_t row, uint8_t col, uint8_t addressingMode);
 void draw_rotated_box(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, int16_t angle, uint8_t ends, uint8_t sides, uint8_t shift, uint8_t addressingMode);
-
+void draw_image_at(uint8_t x0, uint8_t y0, uint8_t img, uint8_t flip, uint8_t dimx, uint8_t dimy, uint8_t addressingMode);
 
 
 
