@@ -88,7 +88,8 @@ int main(void) {
 	uint8_t ui_menu = UI_MENU_MAIN;
 
 	flush_buffer();
-	uint8_t score = 0;
+
+	uint8_t game_over = 0;
 
 
 	uint8_t changes;
@@ -121,6 +122,25 @@ int main(void) {
 					}
 					break;
 				case UI_MENU_RUN:
+					if (game_over) {
+						game_over++;
+						if (game_over % 60 == 0) {
+							draw_large_num(10, 40, 3 - game_over / 60 + 1, OLED_ADDR_DISABLE);
+							if (game_over == 180) {
+								game_over = 0;
+							} else {
+								draw_large_num(10, 40, 3 - game_over / 60, OLED_ADDR_LAYER);
+							}
+						}
+						data[0] = 0;
+						data[1] = 127;
+						data[2] = 0;
+						data[3] = 127;
+						data[4] = 1;
+						data[5] = 0;
+						can_send_data(&msg);
+						break;
+					}
 					sim_tick();
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
@@ -148,9 +168,12 @@ int main(void) {
 
 
 			if (can_try_receive(&recmsg)) {
-				if (recmsg.id == 2) {
-					score++;
-					printf("Score: %i\n", score);
+				if (recmsg.id == 2 && ui_menu == UI_MENU_RUN && !game_over) {
+					draw_large_num(10, 40, 3, OLED_ADDR_LAYER);
+					motor_pos = 127;
+					ui_simulator_update(&input, 127);
+					game_over = 1;
+					printf("Game over!\n");
 				}
 			}
 			flush_buffer();

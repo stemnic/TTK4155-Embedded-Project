@@ -132,6 +132,7 @@ void sim_update_ball() {
 		draw_large_num(10, 40, state.score, OLED_ADDR_DISABLE);
 		state.score = 0;
 		state.redraw_score = 1;
+		state.force = 1;
 	}
 	if (sypos - SIM_BALL_RAD < SIM_TOP_BORDER) {
 		ball.ypos = SIM_TOP_BORDER + SIM_BALL_RAD;
@@ -147,7 +148,7 @@ void sim_update_ball() {
 	draw_circle(ypos, xpos, SIM_BALL_RAD, 1, OLED_ADDR_LAYER);
 	ball.last_xpos = xpos;
 	ball.last_ypos = ypos;
-	if (ball.ypos > 55) state.force = 1;
+	if (ball.ypos > 40) state.force = 1;
 	if (ball.xpos > 40 && ball.xpos < 80 && ball.ypos > 10 && ball.ypos < 30) state.redraw_score = 1;
 }
 
@@ -168,6 +169,9 @@ void sim_tick() {
 	if (state.mode == SIM_MODE_SIMULATOR) {
 		sim_update_ball();
 		sim_draw_score();
+	}
+	if (state.force) {
+		sim_update_actor_angle(state.angle);
 	}
 }
 
