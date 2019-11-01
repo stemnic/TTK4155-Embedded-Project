@@ -14,8 +14,8 @@ the width (length of that edge), height, (length of perpendicular edges), angle,
 where 0 means that the rectangle is horizontal, extending in positive x,
 and an offset, which is shifted in the same direction as height */
 rectangle geo_build_rect(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, uint8_t angle, uint8_t offset) {
-	accum axx = geo_cos(angle);
-	accum ayy = -geo_sin(angle);
+	short accum axx = geo_cos(angle);
+	short accum ayy = -geo_sin(angle);
 	rectangle rect;
 	rect.bx = x0 + axx*width/2 + ayy*offset;
 	rect.by = y0 - ayy*width/2 + axx*offset;

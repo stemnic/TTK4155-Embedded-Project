@@ -49,10 +49,10 @@ uint8_t get_motor_pos(controllerInput* input) {
 }
 
 controllerInput input;
-uint8_t adc_read = 0;
+uint8_t timer_int_tick = 0;
 
-ISR (TIMER0_OVF_vect){
-	adc_read = 1;
+ISR (TIMER0_OVF_vect) {
+	timer_int_tick++;
 }
 
 int main(void) {
@@ -102,11 +102,14 @@ int main(void) {
 
 	uint8_t changes;
 	while (1) {
-		if (adc_read) {
+		if (timer_int_tick) {
+			uint8_t frames = timer_int_tick;
+			timer_int_tick = 0;
+			flush_buffer();
 			changes = read_controller_status(&input);
 			switch(ui_menu) {
 				case UI_MENU_MAIN:
-					ui_menu_tick();
+					ui_menu_tick(frames);
 					if (changes) ui_menu_update(&input);
 					if (input.joystick_button_changed && input.joystick_button) {
 						uint8_t next = get_list_pos();
@@ -122,7 +125,7 @@ int main(void) {
 						uint8_t conv_motor_pos = get_motor_pos(&input);
 						ui_simulator_update(&input, conv_motor_pos);
 					}
-					sim_tick();
+					sim_tick(frames);
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
@@ -149,7 +152,7 @@ int main(void) {
 						can_send_data(&msg);
 						break;
 					}
-					sim_tick();
+					sim_tick(timer_int_tick);
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
@@ -184,10 +187,8 @@ int main(void) {
 					printf("Game over!\n");
 				}
 			}
-			flush_buffer();
-			adc_read = 0;
 		}
-		_delay_ms(1);
+		_delay_us(1);
 	}
 }
 

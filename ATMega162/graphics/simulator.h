@@ -18,7 +18,7 @@ with a bouncing ball that can be deflected, and a counter for score */
 /* Update the actor */
 void sim_update_actor_angle(uint8_t angle);
 /* Simulator tick, updates state */
-void sim_tick();
+void sim_tick(uint8_t frames);
 /* Trigger the simulated solenoid */
 void sim_trigger_solenoid();
 /* Update the position of the actor */

@@ -40,6 +40,6 @@ void ui_simulator_update(controllerInput *_input, uint8_t pos);
 /* Initialize the menu with a given list of menu entries of length len */
 void ui_menu_init(char **list, uint8_t len);
 /* Tick for the UI-menu, updates the ball graphic */
-void ui_menu_tick();
+void ui_menu_tick(uint8_t frames);
 
 #endif /* UI_H_ */

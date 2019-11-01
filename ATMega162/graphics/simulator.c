@@ -109,9 +109,9 @@ void sim_trigger_solenoid() {
 }
 
 /* Tick the ball, updating position and calculating whether to bounce against a wall */
-void sim_update_ball() {
-	ball.xpos += ball.xvel;
-	ball.ypos += ball.yvel;
+void sim_update_ball(uint8_t frames) {
+	ball.xpos += ball.xvel * frames;
+	ball.ypos += ball.yvel * frames;
 	
 	int16_t sxpos = (int16_t)ball.xpos;
 	int16_t sypos = (int16_t)ball.ypos;
@@ -125,7 +125,6 @@ void sim_update_ball() {
 		ball.xvel = -1 * ball.xvel;
 	}
 	if (sypos + SIM_BALL_RAD > SIM_BOTTOM_BORDER) {
-		// TODO Trigger failure in a neat way
 		ball.xpos = 63;
 		ball.ypos = 3;
 		ball.xvel = 0;
@@ -164,14 +163,14 @@ void sim_draw_score() {
 }
 
 /* Simulator tick, count the solenoid reset, update the ball, re-draw the score, draw the angle if state.force is set */
-void sim_tick() {
-	if (state.triggered && state.reset_solenoid++ == 5) {
+void sim_tick(uint8_t frames) {
+	if (state.triggered && (state.reset_solenoid += frames) >= 5) {
 		state.triggered = 0;
 		state.reset_solenoid = 0;
 		sim_update_actor_angle(state.last_angle);
 	}
 	if (state.mode == SIM_MODE_SIMULATOR) {
-		sim_update_ball();
+		sim_update_ball(frames);
 		sim_draw_score();
 	}
 	if (state.force) {
