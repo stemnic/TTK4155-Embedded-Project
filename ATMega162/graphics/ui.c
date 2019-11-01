@@ -25,12 +25,15 @@ uint8_t last_rtrigg = 0;
 uint8_t ltrigg = 0;
 uint8_t rtrigg = 0;
 
-void ui_list_select(int row) {
+/* Select the element of the main-menu list at given index
+Simply inverts the line, which gives a clear impression of index */
+void ui_list_select(uint8_t row) {
 	for (int j = 0; j < lengths[row]*8 + 4; j++) {
 		draw_data_at(row * 8 + 32, 63 - lengths[row]*4 - 2 + j, 0xFF, 1, OLED_ADDR_INVERT);
 	}
 }
 
+/* Init the ui-list with a given list of strings, with length len */
 void ui_list_init(char** options, uint8_t len) {
 	lengths = malloc(len);
 	for (uint8_t i = 0; i < len; i++) {
@@ -45,6 +48,7 @@ void ui_list_init(char** options, uint8_t len) {
 	ui_list_select(listSel);
 }
 
+/* Draw two buttons at the bottom of the screen */
 void ui_buttons_init(char* str1, char* str2) {
 	fill_box(40, 0, 63, 55, OLED_ADDR_OVERWRITE);
 	fill_box(40, 72, 63, 127, OLED_ADDR_OVERWRITE);
@@ -52,6 +56,7 @@ void ui_buttons_init(char* str1, char* str2) {
 	draw_string_at(48, 80, str2, FONT8x8, OLED_ADDR_DISABLE);
 }
 
+/* Trigger the given button, drawing a box at the edge */
 void ui_button_trigger(uint8_t button, uint8_t on) {
 	switch (button) {
 	case BUTTON_1:
@@ -63,6 +68,7 @@ void ui_button_trigger(uint8_t button, uint8_t on) {
 	}
 }
 
+/* Update the list with the given value of joystick_trigger, 1 to increment selection, -1 to decrement */
 void ui_list_update(int8_t joystick_trigger) {
 	if (joystick_trigger != 0 && (joystick_trigger != 1 || listSel > 0) && (joystick_trigger != -1 || listSel < listLen - 1)) {
 		ui_list_select(listSel);
@@ -70,14 +76,17 @@ void ui_list_update(int8_t joystick_trigger) {
 	}
 }
 
+/* Return the current selected list index */
 uint8_t get_list_pos() {
 	return listSel;
 }
 
+/* Draw a big number in the UI, for debug */
 void ui_draw_big_number(uint8_t num) {
 	draw_large_num(16, 90, num, OLED_ADDR_LAYER);
 }
 
+/* Draw a big racket to the left and right of the screen, shifting them based on button presses */
 void ui_draw_rackets(uint8_t left, uint8_t right) {
 	if (last_ltrigg != ltrigg && left) {
 		draw_image_at(last_ltrigg ? 4 : 0, 0, RACKET, 0, 32, 64, OLED_ADDR_DISABLE);
@@ -95,6 +104,8 @@ void ui_draw_rackets(uint8_t left, uint8_t right) {
 	}
 }
 
+/* Tick for the UI-menu, updates the ball graphic
+The ball follows a simple parabolic curve */
 void ui_menu_tick() {
 	ballcnt = 0;
 	draw_circle(5+(ballx*ballx)/125, 63+ballx, 3, 1, OLED_ADDR_DISABLE);
@@ -106,13 +117,13 @@ void ui_menu_tick() {
 	if (ballx > 30) ui_draw_rackets(0, 1);
 }
 
+/* Initialize the menu with a given list of menu entries of length len */
 void ui_menu_init(char **list, uint8_t len) {
 	ui_list_init(list, 2);
 	ui_draw_rackets(1, 1);
 }
 
-
-
+/* Update menu graphics with controller input object */
 void ui_menu_update(controllerInput *_input) {
 	controllerInput input = *(_input);
 	ui_list_update(input.joystick_trigger);
@@ -129,6 +140,7 @@ void ui_menu_update(controllerInput *_input) {
 	ui_draw_rackets(lch, rch);
 }
 
+/* Tick the simulator with given input and actor position */
 void ui_simulator_update(controllerInput *_input, uint8_t pos) {
 	controllerInput input = *(_input);
 	sim_update_actor_angle(255 - input.slider_two_value);

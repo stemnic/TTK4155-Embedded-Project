@@ -10,6 +10,7 @@
 #include "geometry.h"
 #include <math.h>
 #include <stdlib.h>
+#include <stdfix-avrlibc.h>
 
 #define SIM_BALL_RAD 3
 #define SIM_ACTOR_BASE_HEIGHT 12
@@ -53,7 +54,7 @@ typedef struct ballState {
 
 ballState ball;
 
-
+/* Update the actor state with a new angle, also re-draw the actor, clearing the old actor depending on the previous state */
 void sim_update_actor_angle(uint8_t angle) {
 	if (angle == state.last_angle && state.triggered == state.last_triggered && state.last_pos == state.pos && !state.force) return;
 	draw_rotated_box(63, state.last_pos, SIM_ACTOR_WIDTH, SIM_ACTOR_BASE_HEIGHT, state.last_angle, 1, 1, 0, OLED_ADDR_DISABLE);
@@ -78,12 +79,13 @@ uint8_t sim_check_collision() {
 	uint8_t ballx = (uint8_t)ball.xpos;
 	uint8_t bally = (uint8_t)ball.ypos;
 
-	rectangle rect = geo_build_rect(63, state.pos, SIM_ACTOR_WIDTH, SIM_ACTOR_SOL_EXT + SIM_ACTOR_SOL_BASE, state.angle, SIM_ACTOR_BASE_HEIGHT);
+	rectangle rect = geo_build_rect(63, state.pos, SIM_ACTOR_WIDTH, SIM_ACTOR_SOL_EXT + SIM_ACTOR_SOL_BASE, state.angle, SIM_ACTOR_BASE_HEIGHT+SIM_ACTOR_SOL_EXT);
 	circle circ = geo_build_circle(bally, ballx, ball.rad);
 
 	return geo_intersect(&rect, &circ);
 }
 
+/* Trigger the simulated solenoid, causes the actor to be re-rendered, and checks for collision in simulator mode */
 void sim_trigger_solenoid() {
 	if (!state.triggered) {
 		state.triggered = 1;
@@ -96,8 +98,8 @@ void sim_trigger_solenoid() {
 					state.ball_spd_abs += SIM_BALL_SPEED_ACC;
 				}
 				// Get new speed
-				accum ax = geo_cos(state.angle);
-				accum ay = -geo_sin(state.angle);
+				short accum ax = geo_cos(state.angle);
+				short accum ay = -geo_sin(state.angle);
 
 				ball.xvel = ax * state.ball_spd_abs;
 				ball.yvel = ay * state.ball_spd_abs;
@@ -106,6 +108,7 @@ void sim_trigger_solenoid() {
 	}
 }
 
+/* Tick the ball, updating position and calculating whether to bounce against a wall */
 void sim_update_ball() {
 	ball.xpos += ball.xvel;
 	ball.ypos += ball.yvel;
@@ -151,6 +154,7 @@ void sim_update_ball() {
 	if (ball.xpos > 40 && ball.xpos < 80 && ball.ypos > 10 && ball.ypos < 30) state.redraw_score = 1;
 }
 
+/* Draw the score, the number of times the ball has been successfully deflected */
 void sim_draw_score() {
 	if (!state.redraw_score) return;
 	if (state.score > 0) {
@@ -159,6 +163,7 @@ void sim_draw_score() {
 	draw_large_num(10, 40, state.score, OLED_ADDR_LAYER);
 }
 
+/* Simulator tick, count the solenoid reset, update the ball, re-draw the score, draw the angle if state.force is set */
 void sim_tick() {
 	if (state.triggered && state.reset_solenoid++ == 5) {
 		state.triggered = 0;
@@ -174,6 +179,7 @@ void sim_tick() {
 	}
 }
 
+/* Set a new position for the actor */
 void sim_update_pos(uint8_t newpos) {
 	if (newpos != state.pos) {
 		state.pos = newpos;
@@ -181,6 +187,7 @@ void sim_update_pos(uint8_t newpos) {
 	}
 }
 
+/* Init the simulator in given mode, resets the state and the ball */
 void sim_init(uint8_t mode) {
 	state.last_angle = 0;
 	state.pos = 63;

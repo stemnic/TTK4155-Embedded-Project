@@ -17,7 +17,9 @@ int16_t yMean;
 
 volatile char *ext_adc = (char *) 0x1400;
 
-int8_t get_joystick_value_internal(int value, int raw) {
+/* Code to retrieve the value for JOYSTICK_X or JOYSTICK_Y.
+If raw is 1, retrieve the raw value instead (used for calibration) */
+int8_t get_joystick_value_internal(uint8_t value, uint8_t raw) {
 	ext_adc[0] = value == JOYSTICK_X ? ADC_CH1 : ADC_CH2;
 	waitingForADC = 1;
 	
@@ -32,10 +34,12 @@ int8_t get_joystick_value_internal(int value, int raw) {
 	return (int8_t)tempValue;
 }
 
-int8_t get_joystick_value(int value) {
+/* Expose only the raw = 0 version of get_joystick_value_internal. */
+int8_t get_joystick_value(uint8_t value) {
 	return get_joystick_value_internal(value, 0);
 }
 
+/* Calculate the average value of the x and y positions of the joystick */
 void calibrate_joystick(){
 	int xtotal = 0;
 	int ytotal = 0;
@@ -56,7 +60,10 @@ void ADC_init(){
 	calibrate_joystick();
 }
 
-uint8_t get_slider_value(int value) {
+/* Get the value of SLIDER_1 or SLIDER_2, as an 8-bit number
+Writes CH3 or CH4 to memory-mapped IO, spins until an interrupt is received,
+then retrieves the value stored in the interrupt */
+uint8_t get_slider_value(uint8_t value) {
 	ext_adc[0] = value == SLIDER_1 ? ADC_CH3 : ADC_CH4;
 	waitingForADC = 1;
 	
@@ -65,6 +72,8 @@ uint8_t get_slider_value(int value) {
 	return adcBuffer;
 }
 
+/* Triggers on finished ADC conversion.
+Simply buffers the read value from memory-mapped IO and clears a flag */
 ISR (INT0_vect){
 	uint8_t adc_value = ext_adc[0];
 	waitingForADC = 0;

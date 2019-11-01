@@ -19,6 +19,7 @@ typedef struct controllerInput{
 	int8_t joystick_x; // 8
 	int8_t joystick_y; // 8
 
+	// 1 if the joystick y position is above a critical threshold (40), -1 if below, 0 otherwise.
 	int8_t joystick_trigger; // 8 (for negative values)
 	int8_t joystick_trigger_last;
 
@@ -35,8 +36,11 @@ typedef struct controllerInput{
 	uint8_t joystick_button_changed:1;
 } controllerInput;
 
-uint8_t get_button(int button);
+/* Returns the value of the given button, one of BUTTON_1, BUTTON_2 and JOYSTICK_BUTTON.
+Note that the joystick button is inverted */
+uint8_t get_button(uint8_t button);
 
+/* Populate the controllerInput object with fresh values */
 uint8_t read_controller_status(controllerInput *buffer);
 
 #endif /* IO_H_ */

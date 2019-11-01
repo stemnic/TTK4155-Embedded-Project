@@ -20,10 +20,16 @@
 #define SLIDER_1 0
 #define SLIDER_2 1
 
+/* Initialize the ADC:
+Enable interrupt on falling flank on INT0
+Calibrate the joystick to zero initial position. */
 void ADC_init();
 
-int8_t get_joystick_value(int value);
-uint8_t get_slider_value(int value);
+/* Retrieve the value of either JOYSTICK_X or JOYSTICK_Y, calibrated to fit within [-127, 127],
+with a dead-zone of [2, -2] and calibrated so that neutral yields 0. */
+int8_t get_joystick_value(uint8_t value);
+/* Get the value of SLIDER_1 or SLIDER_2, as an 8-bit number */
+uint8_t get_slider_value(uint8_t value);
 
 
 

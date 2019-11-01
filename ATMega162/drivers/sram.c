@@ -13,18 +13,19 @@
 #include <avr/interrupt.h>
 #include "sram.h"
 
-void SRAM_init(){
+/* Enable external memory, this is also required for memory-mapped IO */
+void SRAM_init() {
 	#ifdef DEBUG_LOG
 	printf("Enabling EXTMEM\n");
 	#endif // _DEBUG_LOG
+
 	MCUCR |= (1<<SRE); //Enable EXTMEM
 	SFIOR |= (1<<XMM2);
 	
 	//SFIOR |= (1<<XMBK); //Enable BusKeep
-
 }
-
-void SRAM_test(void){
+/* Test the consistency of sending/receiving data from external memory */
+void SRAM_test(void) {
 	volatile char *ext_ram = (char *) 0x1800; 
 	// Start address for the SRAM
 	uint16_t ext_ram_size= 0x800;

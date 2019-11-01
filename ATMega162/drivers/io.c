@@ -9,11 +9,15 @@
 #include "io.h"
 #include "adc.h"
 
-uint8_t get_button(int button) {
+/* Returns the value of the given button */
+uint8_t get_button(uint8_t button) {
 	uint8_t i = PINB;
 	return (i >> button) & 1;
 }
 
+/* Method to read the current status of buttons, sliders and joystick into the given controllerInput struct.
+Sets all values in the struct, including flags to test if the value has been changed.
+Returns 1 if any value has been changed since last read */
 uint8_t read_controller_status(controllerInput *buffer) {
 	uint8_t changes = 0;
 

@@ -22,18 +22,15 @@
 #define SCROLL_DISABLE 0x2e
 #define SCROLL_ENABLE 0x2f
 
-#define FONT8x8 8
-#define FONT5x7 5
-#define FONT4x6 4
-#define NUMBERS9x16 9
-#define RACKET 0
 
 
+/* Initialize the OLED controller, clearing the screen */
 void oled_init();
+/* Manually clear the screen */
 void oled_clear();
-void oled_write_string (char *chr_ptr, int fontSize);
-void oled_write_char (char chr);
+/* Send a single command byte to the OLED controller */
 void oled_command(uint8_t command);
+/* Write a byte of data to the cursor */
 void oled_write_byte(uint8_t data);
 
 

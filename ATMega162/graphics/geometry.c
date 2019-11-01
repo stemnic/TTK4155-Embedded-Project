@@ -9,6 +9,10 @@
 #include "geometry.h"
 #include "constants.h"
 
+/* Create a rotated rectangle from the center position of one edge (x0, y0),
+the width (length of that edge), height, (length of perpendicular edges), angle,
+where 0 means that the rectangle is horizontal, extending in positive x,
+and an offset, which is shifted in the same direction as height */
 rectangle geo_build_rect(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, uint8_t angle, uint8_t offset) {
 	accum axx = geo_cos(angle);
 	accum ayy = -geo_sin(angle);
@@ -24,6 +28,10 @@ rectangle geo_build_rect(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, 
 	return rect;
 }
 
+/* Returns 1 if the given point (px, py) is within the given rectangle
+Uses formula AP*AD <= AD*AD && AP*AD >= 0 && AP*AB <= AB*AB && AP*AB >= 0
+In other words, the projection onto two perpendicular edges of the rectangle
+is shorter than the edge itself. */
 uint8_t point_in_rectangle(int16_t px, int16_t py, rectangle *_r) {
 	rectangle r = *_r;
 	int16_t apab = (px - r.ax) * (r.bx - r.ax) + (py - r.ay) * (r.by - r.ay);
@@ -34,8 +42,10 @@ uint8_t point_in_rectangle(int16_t px, int16_t py, rectangle *_r) {
 	return (apad <= adad) && (apad >= 0) && (apab <= abab) && (apab >= 0);
 }
 
-// Check if a circle with center (px, py) and radius rad intersects the line ((x0, y0), (x1, y1))
-// Calculates the projection onto the line, then tests if
+/* Check if a circle with center (px, py) and radius rad intersects the line ((x0, y0), (x1, y1))
+Calculates the projection onto the line, then tests if the projection is within the end points,
+also tests if the point is within rad of each of the end points.
+Slightly confusing as it only uses squared arithemtic, to avoid taking the square root*/
 uint8_t intersect_circle(uint8_t px, uint8_t py, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t rad) {
 	// Get the length of the projection onto the line
 	int16_t llen_sq = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0);
@@ -50,7 +60,7 @@ uint8_t intersect_circle(uint8_t px, uint8_t py, uint8_t x0, uint8_t y0, uint8_t
 	if ((dist0 <= llen_sq + len_sq) && (dist1 <= llen_sq + len_sq)) return 1; // Projection is between the two outer points
 	return 0;
 }
-
+/* Construct a circle struct from center point (cx, cy) and rad */
 circle geo_build_circle(uint8_t cx, uint8_t cy, uint8_t rad) {
 	circle circ;
 	circ.cx = cx;
@@ -58,6 +68,7 @@ circle geo_build_circle(uint8_t cx, uint8_t cy, uint8_t rad) {
 	circ.rad = rad;
 	return circ;
 }
+/* Check if a circle intersects with a rectangle, return 1 if it does */
 uint8_t geo_intersect(rectangle *_rect, circle *_circ) {
 	rectangle rect = *_rect;
 	circle circ = *_circ;
@@ -67,11 +78,11 @@ uint8_t geo_intersect(rectangle *_rect, circle *_circ) {
 		|| intersect_circle(circ.cx, circ.cy, rect.cx, rect.cy, rect.dx, rect.dy, circ.rad)
 		|| intersect_circle(circ.cx, circ.cy, rect.dx, rect.dy, rect.ax, rect.ay, circ.rad);
 }
-
-accum geo_cos(uint8_t val) {
+/* Return compact low-res cosine value for the first two quadrants, where 0 is 0 and 255 is pi */
+short accum geo_cos(uint8_t val) {
 	return pregen_cos[val / 8];
 }
-
-accum geo_sin(uint8_t val) {
+/* Return compact low-res sine value for the first two quadrants, where 0 is 0 and 255 is pi */
+short accum geo_sin(uint8_t val) {
 	return pregen_sin[val / 8];
 }
