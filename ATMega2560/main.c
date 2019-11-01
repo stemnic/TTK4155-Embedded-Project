@@ -16,8 +16,23 @@
 #include "drivers/pwm.h"
 #include "drivers/adc.h"
 #include "drivers/motor.h"
+#include "drivers/avrshock2.h"
 
 uint16_t score = 0;
+
+/*
+ PS2 Dualshock mode are based on https://github.com/dhustkoder/avrshock2
+*/
+
+static const char* const button_names[] = {
+	"SELECT", "L3", "R3", "START", "UP", "RIGHT", "DOWN", "LEFT",
+	"L2", "R2", "L1", "R1", "TRIANGLE", "CIRCLE", "CROSS", "SQUARE"
+};
+
+static const char* const axis_names[] = {
+	"RX", "RY",
+	"LX", "LY"
+};
 
 void score_add(){
 	score++;
@@ -75,6 +90,12 @@ int main(void) {
 	process_cycle_clock_init();
 	
 	motor_init();
+	
+	avrshock2_init();
+	avrshock2_set_mode(AVRSHOCK2_MODE_DIGITAL, false);
+	
+	avrshock2_button_t buttons = 0;
+	avrshock2_axis_t axis[AVRSHOCK2_AXIS_NAXIS];
 		
     // Replace with your application code 
 	printf("Init Complete\n");
@@ -103,6 +124,17 @@ int main(void) {
 			timer_int_trigger = 0;
 			solenoid_reset();
 			motor_regulator_tick();
+			
+			// Example from library
+			if (avrshock2_poll(&buttons, axis)) {
+				printf("Controller mode: %.2X\n", (unsigned)avrshock2_get_mode());
+				/* digital */
+				for (int i = 0; i < AVRSHOCK2_BUTTON_NBUTTONS; ++i)
+				printf("BUTTON %s: %d\n", button_names[i], (buttons&(1<<i)) ? 1 : 0);
+				/* axis */
+				for (int i = 0; i < AVRSHOCK2_AXIS_NAXIS; ++i)
+				printf("AXIS %s: %d\n", axis_names[i], (int)axis[i]);
+			}
 		}
 		
 		if (can_try_receive(&message)) {
