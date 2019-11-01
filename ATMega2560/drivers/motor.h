@@ -20,18 +20,22 @@
 #define MOTOR_RIGHT 1
 #define MOTOR_LEFT 0
 
-//typedef motor_direction 
-
+/* Initialize the motor */
 void motor_init();
 
+/* Set the value of the motor directly */
 void motor_value(uint8_t value);
 
+/* Set the direction of the motor, 0 is reverse */
 void motor_direction(uint8_t dir);
 
+/* Get the raw value of the motor encoder */
 uint16_t motor_encoder_value();
 
+/* Tick the motor, calculating new output and setting the motor */
 void motor_regulator_tick();
 
+/* Set the target position of the regulator */
 void motor_set_target_pos(uint8_t _pos);
 
 

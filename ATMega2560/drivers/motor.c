@@ -21,12 +21,14 @@ int16_t acc = 0;
 int16_t target_pos = 4000;
 int16_t last_error = 0;
 
-void motor_encoder_reset(){
+/* Reset encoder value */
+void motor_encoder_reset() {
 	PORTH &= ~(1 << nRST_ENCODER_PIN);
 	_delay_us(10);
 	PORTH |= (1 << nRST_ENCODER_PIN);
 }
 
+/* Calibrate motor, getting outer points and motor range */
 void motor_calibrate(){
 	motor_direction(MOTOR_RIGHT);
 	motor_value(100);
@@ -49,6 +51,7 @@ void motor_calibrate(){
 	motor_scale = ((float)motor_range) / 256.0;
 }
 
+/* Initialize the motor, enabling output on correct pins, and enabling the motor itself */
 void motor_init(){
 	TWI_Master_Initialise();
 	sei();
@@ -63,9 +66,10 @@ void motor_init(){
 	motor_calibrate();
 }
 
-
-
-uint16_t motor_encoder_value(){
+/* Get a normalize value of the motor encoder
+Contains a great deal of code for adjusting
+the edges of the range when a new outside point is detected */
+uint16_t motor_encoder_value() {
 	uint16_t value = 0;
 	PORTH &= ~(1 << nOE_ENCODER_PIN); // !OE low
 	PORTH &= ~(1 << SEL_H_L_ENCODER_PIN); // Get MSB
@@ -116,7 +120,8 @@ uint16_t motor_encoder_value(){
 	}
 }
 
-void motor_direction(uint8_t dir){
+/* Set motor direction, 0 for reverse */
+void motor_direction(uint8_t dir) {
 	if (dir) {
 		PORTH |= (1 << DIR_MOTOR_PIN);
 	} else {
@@ -124,7 +129,8 @@ void motor_direction(uint8_t dir){
 	}
 }
 
-void motor_value(uint8_t value){
+/* Set the motor value directly */
+void motor_value(uint8_t value) {
 	unsigned char message[3] = { MOTOR_ADC_WRITE, 0, 0};
 	if (value > 120) {
 		value = 120;
@@ -133,6 +139,7 @@ void motor_value(uint8_t value){
 	TWI_Start_Transceiver_With_Data(message, 3);
 }
 
+/* Wrapper to set the motor value with saturation and correct direction given a signed value */
 void motor_set_value(int8_t value) {
 	if (value < 0) {
 		motor_direction(MOTOR_LEFT);
@@ -149,13 +156,13 @@ void motor_set_value(int8_t value) {
 #define KP 4
 
 
-
+/* Set the target pos of the regulator */
 void motor_set_target_pos(uint8_t _pos) {
 	target_pos = ((int16_t)_pos)*motor_scale;
 	//printf("New target pos: %i\n", target_pos);
 }
 
-
+/* PID regulator for the motor, K is common gain. */
 void motor_regulator_tick() {
 	uint16_t pos = motor_encoder_value();
 	//printf("Current pos: %i, target pos: %i\n", pos, target_pos);
