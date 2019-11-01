@@ -10,6 +10,7 @@
 #define GEOMETRY_H_
 
 #include <stdint.h>
+#include <stdfix.h>
 
 
 typedef struct rectangle {
@@ -32,7 +33,8 @@ typedef struct circle {
 rectangle geo_build_rect(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, uint8_t angle, uint8_t offset);
 circle geo_build_circle(uint8_t cx, uint8_t cy, uint8_t rad);
 uint8_t geo_intersect(rectangle *_rect, circle *_circ);
-
+accum geo_cos(uint8_t val);
+accum geo_sin(uint8_t val);
 
 
 

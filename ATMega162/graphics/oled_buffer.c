@@ -8,6 +8,7 @@
 #include "../drivers/oled.h"
 #include "oled_buffer.h"
 #include "geometry.h"
+#include "fonts.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -222,5 +223,36 @@ void draw_image_at(uint8_t x0, uint8_t y0, uint8_t img, uint8_t flip, uint8_t di
 				draw_data_at(i*8 + y0, j + x0, get_img_byte(img, j, dimy/8 - i - 1), 8, addressingMode);
 			}
 		}
+	}
+}
+
+uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize) {
+	switch (fontSize) {
+		case FONT8x8:
+		return pgm_read_byte(&(font8[in - 32][col]));
+		case FONT5x7:
+		return pgm_read_byte(&(font8[in - 32][col]));
+		case FONT4x6:
+		return pgm_read_byte(&(font8[in - 32][col]));
+		default:
+		return 0;
+	}
+}
+
+uint16_t get_font_dword(int index, uint8_t col, uint8_t img) {
+	switch (img) {
+		case NUMBERS9x16:
+		return pgm_read_dword(&(font16[index][col]));
+		default:
+		return 0;
+	}
+}
+
+uint8_t get_img_byte(uint8_t img, uint8_t row, uint8_t col) {
+	switch (img) {
+		case RACKET:
+		return pgm_read_byte(&(racket[row][col]));
+		default:
+		return 0;
 	}
 }

@@ -31,6 +31,9 @@ void draw_circle(uint8_t x0, uint8_t y0, uint8_t rad, uint8_t fill, uint8_t addr
 void draw_point_at(uint8_t row, uint8_t col, uint8_t addressingMode);
 void draw_rotated_box(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, int16_t angle, uint8_t ends, uint8_t sides, uint8_t shift, uint8_t addressingMode);
 void draw_image_at(uint8_t x0, uint8_t y0, uint8_t img, uint8_t flip, uint8_t dimx, uint8_t dimy, uint8_t addressingMode);
+uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize);
+uint16_t get_font_dword(int index, uint8_t col, uint8_t img);
+uint8_t get_img_byte(uint8_t img, uint8_t row, uint8_t col);
 
 
 

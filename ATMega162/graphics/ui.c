@@ -96,16 +96,14 @@ void ui_draw_rackets(uint8_t left, uint8_t right) {
 }
 
 void ui_menu_tick() {
-	//if (ballcnt++ == 1) {
-		ballcnt = 0;
-		draw_circle(5+(ballx*ballx)/125, 63+ballx, 3, 1, OLED_ADDR_DISABLE);
-		ballx += dirball*(ballx < -30 || ballx > 30 ? 3 : 2);
-		draw_circle(5+(ballx*ballx)/125, 63+ballx, 3, 1, OLED_ADDR_LAYER);
-		if (ballx >= 50) dirball = -1;
-		if (ballx <= -50) dirball = 1;
-		if (ballx < -30) ui_draw_rackets(1, 0);
-		if (ballx > 30) ui_draw_rackets(0, 1);
-	//}
+	ballcnt = 0;
+	draw_circle(5+(ballx*ballx)/125, 63+ballx, 3, 1, OLED_ADDR_DISABLE);
+	ballx += dirball*(ballx < -30 || ballx > 30 ? 3 : 2);
+	draw_circle(5+(ballx*ballx)/125, 63+ballx, 3, 1, OLED_ADDR_LAYER);
+	if (ballx >= 50) dirball = -1;
+	if (ballx <= -50) dirball = 1;
+	if (ballx < -30) ui_draw_rackets(1, 0);
+	if (ballx > 30) ui_draw_rackets(0, 1);
 }
 
 void ui_menu_init(char **list, uint8_t len) {

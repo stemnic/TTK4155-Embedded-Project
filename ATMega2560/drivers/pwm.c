@@ -34,6 +34,7 @@ void pwm_init(){
 }
 
 void pwm_set_position(uint8_t pos){
+	// Float is actually more efficient than fixed point for multiplication only, so we're keeping float here
 	float c = 9.375;
 	servo_postition_value = 4200 - (((uint16_t)pos)*c);
 }

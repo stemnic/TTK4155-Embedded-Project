@@ -21,8 +21,8 @@
 #define SIM_RIGHT_BORDER 127
 #define SIM_TOP_BORDER 0
 #define SIM_BOTTOM_BORDER 63
-#define SIM_BALL_SPEED_INIT 0.3
-#define SIM_BALL_SPEED_ACC 0.05
+#define SIM_BALL_SPEED_INIT 0.3K
+#define SIM_BALL_SPEED_ACC 0.05K
 
 typedef struct simulatorState {
 	uint8_t angle;
@@ -36,19 +36,19 @@ typedef struct simulatorState {
 	uint8_t force;
 	uint8_t score;
 	uint8_t redraw_score;
-	float ball_spd_abs;
+	unsigned short accum ball_spd_abs;
 } simulatorState;
 
 simulatorState state;
 
 typedef struct ballState {
-	float xpos;
-	float ypos;
+	accum xpos;
+	accum ypos;
 	uint8_t last_xpos; // Only used for drawing
 	uint8_t last_ypos;
 	uint8_t rad;
-	float xvel;
-	float yvel;
+	short accum xvel;
+	short accum yvel;
 } ballState;
 
 ballState ball;
@@ -96,9 +96,8 @@ void sim_trigger_solenoid() {
 					state.ball_spd_abs += SIM_BALL_SPEED_ACC;
 				}
 				// Get new speed
-				float rads = ((float)state.angle) / 512.0 * 2.0 * 22/7; // Scale to 512, multiply by 2*pi
-				float ax = cos(rads);
-				float ay = -sin(rads);
+				accum ax = geo_cos(state.angle);
+				accum ay = -geo_sin(state.angle);
 
 				ball.xvel = ax * state.ball_spd_abs;
 				ball.yvel = ay * state.ball_spd_abs;

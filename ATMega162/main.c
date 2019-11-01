@@ -20,6 +20,7 @@
 #include "graphics/oled_buffer.h"
 #include "graphics/ui.h"
 #include "graphics/simulator.h"
+#include <stdfix.h>
 
 
 #define MOTOR_SPD_SCALE 15
@@ -29,11 +30,11 @@ void process_cycle_clock_init() {
 	TIMSK |= (1 << 1); // Overflow interrupt enable
 }
 
-double motor_pos = 127;
+accum motor_pos = 127;
 
 uint8_t get_motor_pos(controllerInput* input) {
 	uint8_t conv_motor_pos = 0;
-	motor_pos += ((float)input->joystick_x) / MOTOR_SPD_SCALE;
+	motor_pos += ((accum)input->joystick_x) / MOTOR_SPD_SCALE;
 
 	if (motor_pos > 255) {
 		motor_pos = 255;

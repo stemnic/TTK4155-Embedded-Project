@@ -150,9 +150,6 @@
     <Compile Include="drivers\can.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="drivers\fonts.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="drivers\io.c">
       <SubType>compile</SubType>
     </Compile>
@@ -187,6 +184,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="drivers\uart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="graphics\constants.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="graphics\fonts.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="graphics\geometry.c">

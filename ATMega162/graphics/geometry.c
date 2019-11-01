@@ -7,11 +7,11 @@
 
 #include <math.h>
 #include "geometry.h"
+#include "constants.h"
 
 rectangle geo_build_rect(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, uint8_t angle, uint8_t offset) {
-	float rads = ((float)angle) / 512.0 * 2.0 * 22/7; // Scale to 512, multiply by 2*pi
-	float axx = cos(rads);
-	float ayy = -sin(rads);
+	accum axx = geo_cos(angle);
+	accum ayy = -geo_sin(angle);
 	rectangle rect;
 	rect.bx = x0 + axx*width/2 + ayy*offset;
 	rect.by = y0 - ayy*width/2 + axx*offset;
@@ -66,4 +66,12 @@ uint8_t geo_intersect(rectangle *_rect, circle *_circ) {
 		|| intersect_circle(circ.cx, circ.cy, rect.bx, rect.by, rect.cx, rect.cy, circ.rad)
 		|| intersect_circle(circ.cx, circ.cy, rect.cx, rect.cy, rect.dx, rect.dy, circ.rad)
 		|| intersect_circle(circ.cx, circ.cy, rect.dx, rect.dy, rect.ax, rect.ay, circ.rad);
+}
+
+accum geo_cos(uint8_t val) {
+	return pregen_cos[val / 8];
+}
+
+accum geo_sin(uint8_t val) {
+	return pregen_sin[val / 8];
 }

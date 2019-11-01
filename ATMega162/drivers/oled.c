@@ -7,7 +7,6 @@
 
 #include <avr/io.h>
 #include "oled.h"
-#include "fonts.h"
 
 
 volatile char *oled_cmd = (char *) 0x1000;
@@ -55,37 +54,6 @@ void oled_clear(){
 	oled_command(PAGE_START_ADDR_PAGE_BASE);
 	currentPage = 0;
 	currentCol = 0;
-}
-
-uint8_t get_font_byte(char in, uint8_t col, uint8_t fontSize) {
-	switch (fontSize) {
-		case FONT8x8:
-			return pgm_read_byte(&(font8[in - 32][col]));
-		case FONT5x7:
-			return pgm_read_byte(&(font8[in - 32][col]));
-		case FONT4x6:
-			return pgm_read_byte(&(font8[in - 32][col]));
-		default:
-			return 0;
-	}
-}
-
-uint16_t get_font_dword(int index, uint8_t col, uint8_t img) {
-	switch (img) {
-		case NUMBERS9x16:
-			return pgm_read_dword(&(font16[index][col]));
-		default:
-			return 0;
-	}
-}
-
-uint8_t get_img_byte(uint8_t img, uint8_t row, uint8_t col) {
-	switch (img) {
-		case RACKET:
-			return pgm_read_byte(&(racket[row][col]));
-		default:
-			return 0;
-	}
 }
 
 void oled_write_byte(uint8_t data) {
