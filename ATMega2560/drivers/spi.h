@@ -8,10 +8,11 @@
 #ifndef SPI_H_
 #define SPI_H_
 
-
+/* Initialize the SPI system on the ATMega. */
 void spi_init();
 
-void spi_send_data(char *cData, int cDataLen);
+/* Send and receive len bytes over SPI */
+void spi_send_data(uint8_t *buff, uint8_t len);
 
 
 #endif /* SPI_H_ */

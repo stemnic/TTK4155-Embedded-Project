@@ -156,7 +156,7 @@ int main(void) {
 				}*/
 				motor_set_target_pos(message.data[1]);
 				
-				pwm_set_position(message.data[3]);
+				pwm_set_value(message.data[3]);
 				if (message.data[2]){
 					solenoid_fire();
 				}

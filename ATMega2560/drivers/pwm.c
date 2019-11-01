@@ -12,6 +12,8 @@
 
 uint16_t servo_postition_value = 3000;
 
+/* Initialize the PWM driver
+Sets 50Hz period, on a 16bit clock, in fast pwm mode */
 void pwm_init(){
 	
 	PRR0 &= ~(1 << PRTIM1);
@@ -34,11 +36,13 @@ void pwm_init(){
 	| 1 << TOIE1; /* Overflow Interrupt Enable: enabled */
 }
 
-void pwm_set_position(uint8_t pos){
+/* Set the position, scales by a pre-calculated value and offsets to give suitable results based on a value between 0 and 255. */
+void pwm_set_value(uint8_t pos){
 	accum c = 9.375K;
 	servo_postition_value = 4200 - (((uint16_t)pos)*c);
 }
-
+/* The PWM module requires that we set the value to count to at each iteration,
+updating right after reset is sensible in order to prevent data races */
 ISR (TIMER1_OVF_vect){
 	OCR1B = servo_postition_value;
 }

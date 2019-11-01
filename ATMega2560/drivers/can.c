@@ -25,6 +25,9 @@ void can_set_device_mode(uint8_t mode) {
 	mcp_bit_modify(0xE0, 0x0F, mode << 5);
 }
 
+/* Initializes the CAN device, enabling interrupts on TX0, TX1, TX2, RX0, RX1 and ERR
+It also makes sure to set One-shot mode to disabled, and clear message receive filters on RX0 and RX1.
+Finally it clears the interrupt flags to properly reset the device. */
 void can_init() {
 	// Enable interrupts on any transmit buffer empty, or receive buffer full, as well as error during rec/transmission
 	can_set_device_mode(CAN_MODE_CONFIGURATION);
@@ -40,6 +43,8 @@ void can_init() {
 	mcp_write(MCP_MODE_CMD, CANINTF, 0);
 }
 
+/* Wait for the condition set by "mask" to be fulfilled. This spins on the interrupt pin,
+then reads and clears interrupt status from the MCP2515 device once an interrupt is detected. */
 void wait_for_trigger(uint8_t mask) {
 	while ((buffer_waiting & mask) == mask) {
 		// Wait for interrupt pin to go low
@@ -62,6 +67,8 @@ void wait_for_trigger(uint8_t mask) {
 	}
 }
 
+/* Send a message on the first available transmit buffer,
+uses 13 bytes (max length) on the stack rather than doing dynamic allocation */
 void can_send_data(can_msg_t *data) {
 	wait_for_trigger(7 << CAN_TX0);
 	
@@ -96,6 +103,7 @@ void can_send_data(can_msg_t *data) {
 	buffer_waiting |= 1 << buffNum;
 }
 
+/* Receives data from the first available receive buffer. If block is 0, it immediately returns if there is no message in any buffer */
 uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
 	if (!block) {
 		if (!(PIND & (1 << PD2))) {
@@ -131,14 +139,16 @@ uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
 	return 1;
 }
 
-uint8_t can_receive_blocking(can_msg_t *data) {
-	return can_receive_data(data, 1);
+/* Expose can_receive_data with blocking = 1 */
+void can_receive_blocking(can_msg_t *data) {
+	can_receive_data(data, 1);
 }
 
+/* Expose can_receive_data with blocking = 0 */
 uint8_t can_try_receive(can_msg_t *data) {
 	return can_receive_data(data, 0);
 }
 
-ISR (INT2_vect) {
+/* ISR (INT2_vect) {
 	int_trigger = 1;
-}
+} */

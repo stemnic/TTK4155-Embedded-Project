@@ -9,20 +9,19 @@
 #define UART_H_
 #define BAUD 9600
 
-// Initialize USART driver
+/* Initialize USART driver */
 void uart_init();
 
-// Transmit a single character over uart, busy-waiting until sent.
+/* Transmit a single character over uart, busy-waiting until sent. */
 void uart_transmit(char data);
 
+/* Send a character over UART, version used for STDIO */
 int uart_transmit_stdio(char data, FILE* file);
 
-// Transmit a null-terminated string over uart, busy-waiting until sent.
+/* Transmit a null-terminated string over uart, busy-waiting until sent. */
 void uart_print(const char string[]);
 
-// Dequeue the last received 
-//int uart_receive(char* buff, uint16_t maxLen);
-
+/* Receive a single character over UART, used for STDIO */
 int uart_receive_char();
 
 #endif /* UART_H_ */

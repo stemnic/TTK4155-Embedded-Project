@@ -44,6 +44,7 @@ void can_init() {
 	// Clear interrupt flags
 	mcp_write(MCP_MODE_CMD, CANINTF, 0);
 }
+
 /* Wait for the condition set by "mask" to be fulfilled. This spins on the interrupt pin,
 then reads and clears interrupt status from the MCP2515 device once an interrupt is detected. */
 void wait_for_trigger(uint8_t mask) {
@@ -67,6 +68,7 @@ void wait_for_trigger(uint8_t mask) {
 		}
 	}
 }
+
 /* Send a message on the first available transmit buffer,
 uses 13 bytes (max length) on the stack rather than doing dynamic allocation */
 void can_send_data(can_msg_t *data) {
@@ -102,6 +104,7 @@ void can_send_data(can_msg_t *data) {
 	mcp_rts(buffNum - CAN_TX0);
 	buffer_waiting |= 1 << buffNum;
 }
+
 /* Receives data from the first available receive buffer. If block is 0, it immediately returns if there is no message in any buffer */
 uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
 	if (!block) {

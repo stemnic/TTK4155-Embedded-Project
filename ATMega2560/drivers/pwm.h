@@ -9,8 +9,10 @@
 #ifndef PWM_H_
 #define PWM_H_
 
+/* Enable PWM */
 void pwm_init();
 
-void pwm_set_position(uint8_t pos);
+/* Set the pwm value */
+void pwm_set_value(uint8_t pos);
 
 #endif /* PWM_H_ */
