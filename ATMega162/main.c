@@ -59,12 +59,19 @@ int main(void) {
 	fdevopen(uart_transmit_stdio, uart_receive_char);
 	//fdevopen(oled_write_char,uart_receive_char);
 	
+	// Fix PB3 to be an input for WR bodge on PCB
+	DDRB &= ~(1 << PB3 );
+	
 	SRAM_init();
 	//SRAM_test();
 	ADC_init();
+	printf("ADC init\n");
 	oled_init();
+	printf("OLED init\n");
 	spi_init();
+	printf("SPI init\n");
 	can_init();
+	printf("CAN init\n");
 	
 	wipe_buffer();
 	char * liststr[4] = { "Simulate", "Play" };
