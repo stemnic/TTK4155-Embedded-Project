@@ -32,7 +32,7 @@ void process_cycle_clock_init() {
 
 accum motor_pos = 127;
 
-uint8_t get_motor_pos(controllerInput* input) {
+uint8_t get_motor_pos(controller_input_t* input) {
 	uint8_t conv_motor_pos = 0;
 	motor_pos += ((accum)input->joystick_x) / MOTOR_SPD_SCALE;
 
@@ -48,7 +48,7 @@ uint8_t get_motor_pos(controllerInput* input) {
 	return conv_motor_pos;
 }
 
-controllerInput input;
+controller_input_t input;
 uint8_t timer_int_tick = 0;
 
 ISR (TIMER0_OVF_vect) {

@@ -34,9 +34,9 @@ uint8_t get_list_pos();
 /* Draw a big number in the UI, for debug */
 void ui_draw_big_number(uint8_t num);
 /* Update menu graphics with controller input object */
-void ui_menu_update(controllerInput *_input);
+void ui_menu_update(controller_input_t *_input);
 /* Tick the simulator with given input and actor position */
-void ui_simulator_update(controllerInput *_input, uint8_t pos);
+void ui_simulator_update(controller_input_t *_input, uint8_t pos);
 /* Initialize the menu with a given list of menu entries of length len */
 void ui_menu_init(char **list, uint8_t len);
 /* Tick for the UI-menu, updates the ball graphic */

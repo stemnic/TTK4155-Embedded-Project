@@ -124,8 +124,8 @@ void ui_menu_init(char **list, uint8_t len) {
 }
 
 /* Update menu graphics with controller input object */
-void ui_menu_update(controllerInput *_input) {
-	controllerInput input = *(_input);
+void ui_menu_update(controller_input_t *_input) {
+	controller_input_t input = *(_input);
 	ui_list_update(input.joystick_trigger);
 	uint8_t lch = 0;
 	uint8_t rch = 0;
@@ -141,8 +141,8 @@ void ui_menu_update(controllerInput *_input) {
 }
 
 /* Tick the simulator with given input and actor position */
-void ui_simulator_update(controllerInput *_input, uint8_t pos) {
-	controllerInput input = *(_input);
+void ui_simulator_update(controller_input_t *_input, uint8_t pos) {
+	controller_input_t input = *(_input);
 	sim_update_actor_angle(255 - input.slider_two_value);
 	if (input.joystick_button_changed && input.joystick_button) {
 		sim_trigger_solenoid();

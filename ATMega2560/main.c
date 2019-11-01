@@ -91,11 +91,11 @@ int main(void) {
 	
 	motor_init();
 	
-	avrshock2_init();
-	avrshock2_set_mode(AVRSHOCK2_MODE_DIGITAL, false);
+	//avrshock2_init();
+	//avrshock2_set_mode(AVRSHOCK2_MODE_DIGITAL, false);
 	
-	avrshock2_button_t buttons = 0;
-	avrshock2_axis_t axis[AVRSHOCK2_AXIS_NAXIS];
+	//avrshock2_button_t buttons = 0;
+	//avrshock2_axis_t axis[AVRSHOCK2_AXIS_NAXIS];
 		
     // Replace with your application code 
 	printf("Init Complete\n");
@@ -126,34 +126,19 @@ int main(void) {
 			motor_regulator_tick();
 			
 			// Example from library
-			if (avrshock2_poll(&buttons, axis)) {
+			/*if (avrshock2_poll(&buttons, axis)) {
 				printf("Controller mode: %.2X\n", (unsigned)avrshock2_get_mode());
-				/* digital */
+				// digital
 				for (int i = 0; i < AVRSHOCK2_BUTTON_NBUTTONS; ++i)
 				printf("BUTTON %s: %d\n", button_names[i], (buttons&(1<<i)) ? 1 : 0);
-				/* axis */
+				// axis
 				for (int i = 0; i < AVRSHOCK2_AXIS_NAXIS; ++i)
 				printf("AXIS %s: %d\n", axis_names[i], (int)axis[i]);
-			}
+			}*/
 		}
 		
 		if (can_try_receive(&message)) {
 			if (message.id == 1) {
-				int8_t x_value = (int8_t)message.data[0];
-				int8_t y_value = (int8_t)message.data[1];
-				
-				/*if (abs(x_value) > 0) {
-					if ( x_value > 0) {
-						motor_direction(MOTOR_RIGHT);
-					}
-					else if ( x_value < 0) {
-						motor_direction(MOTOR_LEFT);
-					}
-					motor_value(abs(x_value));
-					printf("Motor value: %i\n", motor_encoder_value());
-				} else {
-					motor_value(0);
-				}*/
 				motor_set_target_pos(message.data[1]);
 				
 				pwm_set_value(message.data[3]);

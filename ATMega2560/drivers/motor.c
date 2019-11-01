@@ -16,9 +16,10 @@
 uint16_t motor_right_point = 0;
 uint16_t motor_left_point = 0;
 uint16_t motor_range = 0;
-accum motor_scale = 0;
-accum acc = 0;
+float motor_scale = 0;
+int16_t acc = 0;
 int16_t target_pos = 4000;
+int16_t last_error = 0;
 
 void motor_encoder_reset(){
 	PORTH &= ~(1 << nRST_ENCODER_PIN);
@@ -45,7 +46,7 @@ void motor_calibrate(){
 	} else {
 		motor_range = (1 << 15) - motor_right_point + motor_left_point;
 	}
-	motor_scale = ((accum)motor_range) / 256K;
+	motor_scale = ((float)motor_range) / 256.0;
 }
 
 void motor_init(){
@@ -142,8 +143,9 @@ void motor_set_value(int8_t value) {
 	motor_value(abs(value)*2);
 }
 
-#define K 0.01K
-#define KI 0.05K
+#define K 0.01
+#define KI 0.07
+#define KD 0.20
 #define KP 4
 
 
@@ -153,12 +155,13 @@ void motor_set_target_pos(uint8_t _pos) {
 	//printf("New target pos: %i\n", target_pos);
 }
 
+
 void motor_regulator_tick() {
 	uint16_t pos = motor_encoder_value();
 	//printf("Current pos: %i, target pos: %i\n", pos, target_pos);
-	accum error = -(target_pos - pos);
+	int16_t error = -(target_pos - pos);
 	acc += K * error;
-	int16_t regraw = (int16_t)(K*KP * error) + (int16_t)(KI * acc);
+	int16_t regraw = (int16_t)(K*KP * (float)error) + (int16_t)(KI * (float)acc) + (int16_t)(K*KD * (float)(error - last_error)*60);
 	//printf("raw reg: %i, error: %i\n", regraw, error);
 	int8_t regval = 0;
 	if (regraw > 127) {
@@ -168,5 +171,6 @@ void motor_regulator_tick() {
 	} else {
 		regval = (int8_t)regraw;
 	}
+	last_error = error;
 	motor_set_value(regval);
 }

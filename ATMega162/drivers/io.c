@@ -18,7 +18,7 @@ uint8_t get_button(uint8_t button) {
 /* Method to read the current status of buttons, sliders and joystick into the given controllerInput struct.
 Sets all values in the struct, including flags to test if the value has been changed.
 Returns 1 if any value has been changed since last read */
-uint8_t read_controller_status(controllerInput *buffer) {
+uint8_t read_controller_status(controller_input_t *buffer) {
 	uint8_t changes = 0;
 
 	uint8_t js_button = !get_button(JOYSTICK_BUTTON);

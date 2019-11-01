@@ -38,7 +38,7 @@ void pwm_init(){
 
 /* Set the position, scales by a pre-calculated value and offsets to give suitable results based on a value between 0 and 255. */
 void pwm_set_value(uint8_t pos){
-	accum c = 9.375K;
+	float c = 9.375;
 	servo_postition_value = 4200 - (((uint16_t)pos)*c);
 }
 /* The PWM module requires that we set the value to count to at each iteration,
