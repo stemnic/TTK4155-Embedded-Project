@@ -8,7 +8,6 @@
 #include "oled_buffer.h"
 #include "simulator.h"
 #include "geometry.h"
-#include <math.h>
 #include <stdlib.h>
 #include <stdfix-avrlibc.h>
 #include "../drivers/eeprom.h"

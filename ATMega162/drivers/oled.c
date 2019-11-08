@@ -18,7 +18,7 @@ void oled_command(uint8_t command){
 }
 
 /* Initialize the OLED controller */
-void oled_init(){
+void oled_init() {
 	// Disable the display before configuring
 	oled_command(DISPLAY_OFF);
 	

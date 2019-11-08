@@ -5,7 +5,6 @@
  *  Author: Einar
  */ 
 
-#include <math.h>
 #include "geometry.h"
 #include "constants.h"
 #include "../compact_math.h"
