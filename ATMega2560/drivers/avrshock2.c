@@ -4,6 +4,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <stdio.h>
 #include "avrshock2.h"
 
 /* *
@@ -104,12 +105,15 @@ static void send_cmd(const uint8_t* const restrict cmd, const uint8_t cmdsize)
 	const uint8_t recvsize = ((avrshock2_data_buffer[1]&0x0F) * 2) + 3;
 
 	/* send and receive the rest of the data */
+	//printf("PS2 current data buffer:");
 	short i = 2;
 	for (; i <= cmdsize; ++i)
 		avrshock2_data_buffer[i] = exchange(cmd[i - 1]);
-	for (; i < recvsize; ++i)
+	for (; i < recvsize; ++i){
 		avrshock2_data_buffer[i] = exchange(0x00);
-
+		//printf(" %i ", avrshock2_data_buffer[i]);
+	}
+	//printf("\n");
 	PORT_ATT |= BIT_ATT;
 	_delay_us(ATT_DELAY);
 }
@@ -145,7 +149,7 @@ void avrshock2_init(void)
 	PORT_CMD |= BIT_CMD;
 
 	#ifdef AVRSHOCK2_BIT_BANG
-	SPCR &= ~(0x01<<SPE);
+	//SPCR &= ~(0x01<<SPE);
 	#else
 	#if F_AVRSHOCK2 != 250000
 	#error AVRSHOCK2 SPI Mode only support frequency 250000
@@ -172,7 +176,9 @@ void avrshock2_set_mode(const avrshock2_mode_t mode, const bool lock)
 		send_cmd(mode_cmd, sizeof mode_cmd);
 		exit_cfg_mode();
 		poll(64);
+		//printf("PS2 mode got: %i, expected: %i\n", avrshock2_data_buffer[1], mode);
 	} while (mode != avrshock2_get_mode());
+	//printf("avrshock2 set mode\n");
 }
 
 bool avrshock2_poll(avrshock2_button_t* const buttons,
@@ -185,6 +191,7 @@ bool avrshock2_poll(avrshock2_button_t* const buttons,
 
 	const uint8_t* const data = &avrshock2_data_buffer[3];
 	const avrshock2_mode_t mode = avrshock2_get_mode();
+	//printf("Controller mode %i\n", mode);
 	const uint8_t data_size = mode == AVRSHOCK2_MODE_DIGITAL ? 2 : 6;
 	
 	*buttons = ~((data[1]<<8)|data[0]);

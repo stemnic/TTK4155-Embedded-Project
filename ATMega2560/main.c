@@ -91,11 +91,13 @@ int main(void) {
 	
 	motor_init();
 	
-	//avrshock2_init();
-	//avrshock2_set_mode(AVRSHOCK2_MODE_DIGITAL, false);
+	avrshock2_init();
+	avrshock2_set_mode(AVRSHOCK2_MODE_DIGITAL, false);
 	
-	//avrshock2_button_t buttons = 0;
-	//avrshock2_axis_t axis[AVRSHOCK2_AXIS_NAXIS];
+	spi_switch_mode(0);
+	
+	avrshock2_button_t buttons = 0;
+	avrshock2_axis_t axis[AVRSHOCK2_AXIS_NAXIS];
 		
 	printf("Init Complete\n");
 	uint8_t buffer[4];
@@ -123,17 +125,18 @@ int main(void) {
 			timer_int_trigger = 0;
 			solenoid_reset();
 			motor_regulator_tick();
-			
-			// Example from library
-			/*if (avrshock2_poll(&buttons, axis)) {
-				printf("Controller mode: %.2X\n", (unsigned)avrshock2_get_mode());
-				// digital
-				for (int i = 0; i < AVRSHOCK2_BUTTON_NBUTTONS; ++i)
-				printf("BUTTON %s: %d\n", button_names[i], (buttons&(1<<i)) ? 1 : 0);
-				// axis
-				for (int i = 0; i < AVRSHOCK2_AXIS_NAXIS; ++i)
-				printf("AXIS %s: %d\n", axis_names[i], (int)axis[i]);
-			}*/
+			spi_switch_mode(1);
+			if (avrshock2_poll(&buttons, axis)) {
+				//printf("Controller mode: %.2X\n", (unsigned)avrshock2_get_mode());
+				/* digital */
+				//for (int i = 0; i < AVRSHOCK2_BUTTON_NBUTTONS; ++i)
+				//printf("BUTTON %s: %d\n", button_names[i], (buttons&(1<<i)) ? 1 : 0);
+				/* axis */
+				//for (int i = 0; i < AVRSHOCK2_AXIS_NAXIS; ++i)
+				//printf("AXIS %s: %d\n", axis_names[i], (int)axis[i]);
+				//printf("\n\n");
+			}
+			spi_switch_mode(0);
 		}
 		
 		if (can_try_receive(&message)) {
@@ -146,8 +149,13 @@ int main(void) {
 				}
 			}
 		}
+		
 		//printf("ir trigger: %i\n", ir_trigger);
 		//printf("x: %i, y: %i, button: %i, slider: %i\n", (int8_t)message.data[0], (int8_t)message.data[1], message.data[2], (uint8_t)message.data[3]);
+		
+		// Example from library
+
+		_delay_us(1);
 	}
 }
 

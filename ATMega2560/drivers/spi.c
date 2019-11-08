@@ -24,6 +24,16 @@ void spi_init(){
 	//CPOL=1 and CPHA=1 for SPI mode 3, trying SPI mode 0 |(1<<CPOL)|(1<<CPHA)
 }
 
+void spi_switch_mode(uint8_t controller_mode){
+	if (controller_mode)
+	{
+		/* Switches to spi mode for avrshock*/
+		SPCR = (0x01<<SPR1)|(0x01<<CPHA)|(0x01<<CPOL)|(0x01<<MSTR)|(0x01<<DORD)|(0x01<<SPE);
+	} else {
+		SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
+	}
+}
+
 /* Enable the slave, starting communication */
 void spi_start_communication(){
 	PORTB &= ~(1<<DDRB_SS);
