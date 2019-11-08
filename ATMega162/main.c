@@ -52,6 +52,20 @@ uint8_t get_motor_pos(controller_input_t* input) {
 	return conv_motor_pos;
 }
 
+void game_over_countdown(uint8_t *game_over) {
+	(*game_over)++;
+	if (*game_over % 60 == 0) {
+		draw_num(10, 40, 3 - *game_over / 60 + 1, 1, OLED_ADDR_DISABLE);
+		if (*game_over == 180) {
+			*game_over = 0;
+			sim_set_score(0);
+			sim_high_score(1);
+		} else {
+			draw_num(10, 40, 3 - *game_over / 60, 1, OLED_ADDR_LAYER);
+		}
+	}
+}
+
 uint8_t timer_int_tick = 0;
 
 ISR (TIMER0_OVF_vect) {
@@ -149,29 +163,50 @@ int main(void) {
 					}
 					break;
 				case UI_MENU_SIM:
-					if (changes || input.joystick_x) {
-						uint8_t conv_motor_pos = get_motor_pos(&input);
-						ui_simulator_update(&input, conv_motor_pos);
-					}
-					sim_tick(frames);
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
 						ui_menu_init(liststr, 3);
+						game_over = 0;
+						break;
 					}
+				    if (game_over) {
+						game_over_countdown(&game_over);
+						motor_pos = 127;
+						ui_simulator_update(&input, 127);
+						break;
+					}
+					if (changes || input.joystick_x) {
+						uint8_t conv_motor_pos = get_motor_pos(&input);
+						ui_simulator_update(&input, conv_motor_pos);
+					}
+					if (sim_tick(frames)) {
+						if (update_scores(SIM_MODE_SIMULATOR, sim_get_score())) {
+							sim_high_score(0);
+						}
+						sim_set_score(3);
+
+						game_over = 1;
+					}
+
 					break;
 				case UI_MENU_RUN:
+					if (input.button_one_changed && input.button_one_value) {
+						ui_menu = UI_MENU_MAIN;
+						wipe_buffer();
+						ui_menu_init(liststr, 3);
+						data[0] = 0;
+						data[1] = 127;
+						data[2] = 0;
+						data[3] = 127;
+						data[4] = 1;
+						data[5] = 0;
+						can_send_data(&msg);
+						game_over = 0;
+						break;
+					}
 					if (game_over) {
-						game_over++;
-						if (game_over % 60 == 0) {
-							draw_num(10, 40, 3 - game_over / 60 + 1, 1, OLED_ADDR_DISABLE);
-							if (game_over == 180) {
-								game_over = 0;
-								sim_set_score(0);
-							} else {
-								draw_num(10, 40, 3 - game_over / 60, 1, OLED_ADDR_LAYER);
-							}
-						}
+						game_over_countdown(&game_over);
 						data[0] = 0;
 						data[1] = 127;
 						data[2] = 0;
@@ -182,18 +217,7 @@ int main(void) {
 						break;
 					}
 					sim_tick(frames);
-					if (input.button_one_changed && input.button_one_value) {
-						ui_menu = UI_MENU_MAIN;
-						wipe_buffer();
-						ui_menu_init(liststr, 3);
-						data[0] = 0;
-						data[1] = 127;
-						data[2] = 0;
-						data[3] = 127;
-						data[4] = 1;
-						data[5] = 0;
-						can_send_data(&msg);
-					} else if (changes || input.joystick_x) {
+					if (changes || input.joystick_x) {
 						uint8_t conv_motor_pos = get_motor_pos(&input);
 						ui_simulator_update(&input, conv_motor_pos);
 						data[0] = input.joystick_x;
@@ -238,7 +262,9 @@ int main(void) {
 					scoring_enabled = 0;
 					score_counter = 0;
 					// Persist score to EEPROM.
-					update_scores(SIM_MODE_RUN, score_timer);
+					if (update_scores(SIM_MODE_RUN, score_timer)) {
+						sim_high_score(0);
+					}
 
 					score_timer = 0;
 					#ifdef DEBUG

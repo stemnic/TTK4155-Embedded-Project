@@ -109,7 +109,7 @@ void sim_trigger_solenoid() {
 }
 
 /* Tick the ball, updating position and calculating whether to bounce against a wall */
-void sim_update_ball(uint8_t frames) {
+uint8_t sim_update_ball(uint8_t frames) {
 	ball.xpos += long_accum_mult(ball.xvel, frames);
 	ball.ypos += long_accum_mult(ball.yvel, frames);
 	
@@ -130,10 +130,8 @@ void sim_update_ball(uint8_t frames) {
 		ball.xvel = 0;
 		ball.yvel = SIM_BALL_SPEED_INIT;
 		state.ball_spd_abs = SIM_BALL_SPEED_INIT;
-		update_scores(SIM_MODE_SIMULATOR, state.score);
-		sim_set_score(0);
-		state.redraw_score = 1;
-		state.force = 1;
+		draw_circle(ball.last_ypos, ball.last_xpos, SIM_BALL_RAD, 1, OLED_ADDR_DISABLE);
+		return 1;
 	}
 	if (sypos - SIM_BALL_RAD < SIM_TOP_BORDER) {
 		ball.ypos = SIM_TOP_BORDER + SIM_BALL_RAD;
@@ -144,17 +142,19 @@ void sim_update_ball(uint8_t frames) {
 	uint8_t ypos = (uint8_t)ball.ypos;
 	
 
-	if (xpos == ball.last_xpos && ypos == ball.last_ypos) return;
+	if (xpos == ball.last_xpos && ypos == ball.last_ypos) return 0;
 	draw_circle(ball.last_ypos, ball.last_xpos, SIM_BALL_RAD, 1, OLED_ADDR_DISABLE);
 	draw_circle(ypos, xpos, SIM_BALL_RAD, 1, OLED_ADDR_LAYER);
 	ball.last_xpos = xpos;
 	ball.last_ypos = ypos;
 	if (ball.ypos > 40) state.force = 1;
 	if (ball.xpos > 40 && ball.xpos < 80 && ball.ypos > 10 && ball.ypos < 30) state.redraw_score = 1;
+	return 0;
 }
 
 /* Simulator tick, count the solenoid reset, update the ball, re-draw the score, draw the angle if state.force is set */
-void sim_tick(uint8_t frames) {
+uint8_t sim_tick(uint8_t frames) {
+	uint8_t game_over = 0;
 	#ifndef DEBUG
 	if (state.triggered && (state.reset_solenoid += frames) >= 5) {
 		state.triggered = 0;
@@ -162,7 +162,7 @@ void sim_tick(uint8_t frames) {
 		sim_update_actor_angle(state.last_angle);
 	}
 	if (state.mode == SIM_MODE_SIMULATOR) {
-		sim_update_ball(frames);
+		game_over = sim_update_ball(frames);
 		if (state.redraw_score) {
 			sim_set_score(state.score);
 		}
@@ -171,6 +171,7 @@ void sim_tick(uint8_t frames) {
 		sim_update_actor_angle(state.angle);
 	}
 	#endif
+	return game_over;
 }
 
 /* Set a new position for the actor */
@@ -188,6 +189,10 @@ void sim_set_score(uint16_t score) {
 	draw_num(10, 40, score, 1, OLED_ADDR_LAYER);
 	state.score = score;
 	state.redraw_score = 1;
+}
+
+void sim_high_score(uint8_t disable) {
+	draw_string_at(26, 4, "New high score!", FONT8x8, disable ? OLED_ADDR_DISABLE : OLED_ADDR_LAYER);
 }
 
 /* Init the simulator in given mode, resets the state and the ball */
@@ -214,6 +219,10 @@ void sim_init(uint8_t mode) {
 		ball.yvel = SIM_BALL_SPEED_INIT;
 		state.ball_spd_abs = SIM_BALL_SPEED_INIT;
 	}
+}
+
+uint16_t sim_get_score() {
+	return state.score;
 }
 
 
