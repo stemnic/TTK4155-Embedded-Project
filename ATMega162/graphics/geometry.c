@@ -8,6 +8,7 @@
 #include <math.h>
 #include "geometry.h"
 #include "constants.h"
+#include "../compact_math.h"
 
 /* Create a rotated rectangle from the center position of one edge (x0, y0),
 the width (length of that edge), height, (length of perpendicular edges), angle,
@@ -17,14 +18,15 @@ rectangle geo_build_rect(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, 
 	short accum axx = geo_cos(angle);
 	short accum ayy = -geo_sin(angle);
 	rectangle rect;
-	rect.bx = x0 + axx*width/2 + ayy*offset;
-	rect.by = y0 - ayy*width/2 + axx*offset;
-	rect.cx = x0 - axx*width/2 + ayy*offset; //D
-	rect.cy = y0 + ayy*width/2 + axx*offset;
-	rect.ax = rect.bx + ayy*height; //B
-	rect.ay = rect.by + axx*height;
-	rect.dx = rect.cx + ayy*height; //C
-	rect.dy = rect.cy + axx*height;
+	width = width / 2;
+	rect.bx = x0 + accum_mult(axx, width) + accum_mult(ayy, offset);
+	rect.by = y0 - accum_mult(ayy, width) + accum_mult(axx, offset);
+	rect.cx = x0 - accum_mult(axx, width) + accum_mult(ayy, offset); //D
+	rect.cy = y0 + accum_mult(ayy, width) + accum_mult(axx, offset);
+	rect.ax = rect.bx + accum_mult(ayy, height); //B
+	rect.ay = rect.by + accum_mult(axx, height);
+	rect.dx = rect.cx + accum_mult(ayy, height); //C
+	rect.dy = rect.cy + accum_mult(axx, height);
 	return rect;
 }
 

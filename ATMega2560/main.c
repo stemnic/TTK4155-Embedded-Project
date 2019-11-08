@@ -97,7 +97,6 @@ int main(void) {
 	//avrshock2_button_t buttons = 0;
 	//avrshock2_axis_t axis[AVRSHOCK2_AXIS_NAXIS];
 		
-    // Replace with your application code 
 	printf("Init Complete\n");
 	uint8_t buffer[4];
 	can_msg_t message;

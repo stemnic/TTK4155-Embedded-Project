@@ -25,6 +25,8 @@ void sim_trigger_solenoid();
 void sim_update_pos(uint8_t pos);
 /* Init the simulator in given mode, SIM_MODE_SIMULATOR or SIM_MODE_RUN */
 void sim_init(uint8_t mode);
+/* Set and draw the score value of the simulator */
+void sim_set_score(uint16_t score);
 
 
 #endif /* SIMULATOR_H_ */

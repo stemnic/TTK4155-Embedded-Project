@@ -34,19 +34,19 @@ OLED_ADDR_OVERWRITE: Set the bits, ignoring previous values
 OLED_ADDR_LAYER: OR the bits into OLED
 OLED_ADDR_DISABLE: Disable the bits, using data as a mask
 OLED_ADDR_INVERT: Invert the bits, using data as a mask */
-void draw_data_at(uint8_t row, uint8_t col, uint8_t data, uint8_t len, uint8_t addressing_mode);
+void draw_data_at(uint8_t x0, uint8_t y0, uint8_t data, uint8_t len, uint8_t addressing_mode);
 
 /* Draw a string of characters at the given position */
-void draw_string_at(uint8_t row, uint8_t col, char* str, uint8_t fontSize, uint8_t addressing_mode);
+void draw_string_at(uint8_t x0, uint8_t y0, char* str, uint8_t fontSize, uint8_t addressing_mode);
 /* Draw a 16x9 number, with any number of digits */
-void draw_large_num (uint8_t row, uint8_t col, uint8_t num, uint8_t addressing_mode);
+void draw_num (uint8_t x0, uint8_t y0, uint16_t num, uint8_t large, uint8_t addressing_mode);
 /* Draw given image coded as an array of 8-bit values with top left corner at (x0, y0).
 dimx, dimy must be the full dimensions of the image, as drawing only part creates issues, since each byte is flipped.
 If flip is 1, flip the image around the y-axis */
 void draw_image_at(uint8_t x0, uint8_t y0, uint8_t img, uint8_t flip, uint8_t dimx, uint8_t dimy, uint8_t addressing_mode);
 
 /* Draw a single bit at the given position */
-void draw_point_at(uint8_t row, uint8_t col, uint8_t addressing_mode);
+void draw_point_at(uint8_t x0, uint8_t y0, uint8_t addressing_mode);
 
 /* Draw a line from (x0, y0) to (x1, y1) */
 void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressing_mode);

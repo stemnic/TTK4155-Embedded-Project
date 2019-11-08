@@ -6,12 +6,11 @@
  */ 
 #include <avr/io.h>
 #include "../drivers/oled.h"
+#include "../compact_math.h"
 #include "oled_buffer.h"
 #include "geometry.h"
 #include "fonts.h"
-#include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 volatile char* ext_ram = (char *) 0x1800;
 
 /* 1 if the contents of the buffer has been changed since last flush */
@@ -96,8 +95,8 @@ void draw_point_at(uint8_t x, uint8_t y, uint8_t addressingMode) {
 
 /* Draw a line from (x0, y0) to (x1, y1) */
 void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode) {
-	int16_t dx = abs(((int16_t)x1) - ((int16_t)x0));
-	int16_t dy = -abs(((int16_t)y1) - ((int16_t)y0));
+	int16_t dx = abs_diff(x1, x0);
+	int16_t dy = -abs_diff(y1, y0);
 	int16_t err = dx+dy;
 	int16_t sx = x0 < x1 ? 1 : -1;
 	int16_t sy = y0 < y1 ? 1 : -1;
@@ -137,12 +136,12 @@ void draw_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t width, uin
 void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode) {
 	int8_t sx = x0 < x1 ? 8 : -8;
 	int8_t sy = y0 < y1 ? 1 : -1;
-	uint8_t dx = abs(x1 - x0);
+	uint8_t dx = abs_diff(x1, x0);
 	uint8_t x = x0;
 	while (dx > 0) {
 		uint8_t len = dx < 8 ? dx : 8;
 		for (int y = y0; y <= y1; y += sy) {
-			draw_data_at(x, y, 0xFF << (8 - len - 1), len, addressingMode);
+			draw_data_at(x, y, 0xFF, len, addressingMode);
 		}
 		dx -= len;
 		x += sx;
@@ -165,15 +164,19 @@ void draw_rotated_box(uint8_t x0, uint8_t y0, uint8_t width, uint8_t height, uin
 }
 
 /* Draw a 16x9 number */
-void draw_large_num (uint8_t row, uint8_t col, uint8_t num, uint8_t addressing_mode) {
+void draw_num (uint8_t x0, uint8_t y0, uint16_t num, uint8_t large, uint8_t addressing_mode) {
 	uint8_t cnt = 0;
-	uint8_t len = num == 0 ? 1 : log10(num) + 1;
+	uint8_t len = num == 0 ? 1 : num_len(num);
 	do {
 		uint8_t digit = num % 10;
-		for (int i = 0; i < 9; i++) {
-			uint16_t val = get_font_dword(digit, i, NUMBERS9x16);
-			draw_data_at(row, (col + i) + 9 * (len - cnt), val & 0xFF, 8, addressing_mode);
-			draw_data_at(row + 8, (col + i) + 9 * (len - cnt), (val & 0xFF00) >> 8, 8, addressing_mode);
+		if (large) {
+			for (int i = 0; i < 9; i++) {
+				uint16_t val = get_font_dword(digit, i, NUMBERS9x16);
+				draw_data_at(x0, (y0 + i) + 9 * (len - cnt), val & 0xFF, 8, addressing_mode);
+				draw_data_at(x0 + 8, (y0 + i) + 9 * (len - cnt), (val & 0xFF00) >> 8, 8, addressing_mode);
+			}
+		} else {
+			draw_char_at(x0, y0 + 8 * (len - cnt), '0' + digit, FONT8x8, addressing_mode);
 		}
 		num = num / 10;
 		cnt++;

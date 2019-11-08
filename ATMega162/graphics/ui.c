@@ -10,6 +10,7 @@
 #include "simulator.h"
 #include "../drivers/io.h"
 #include "../drivers/oled.h"
+#include "../drivers/eeprom.h"
 #include <stdlib.h>
 
 uint8_t listSel = 0;
@@ -20,10 +21,12 @@ uint8_t ballcnt = 0;
 
 uint8_t *lengths;
 
-uint8_t last_ltrigg = 0;
-uint8_t last_rtrigg = 0;
-uint8_t ltrigg = 0;
 uint8_t rtrigg = 0;
+uint8_t ltrigg = 0;
+uint8_t last_rtrigg = 0;
+uint8_t last_ltrigg = 0;
+
+uint8_t wipe_state = 0;
 
 /* Select the element of the main-menu list at given index
 Simply inverts the line, which gives a clear impression of index */
@@ -48,23 +51,31 @@ void ui_list_init(char** options, uint8_t len) {
 	ui_list_select(listSel);
 }
 
-/* Draw two buttons at the bottom of the screen */
-void ui_buttons_init(char* str1, char* str2) {
-	fill_box(40, 0, 63, 55, OLED_ADDR_OVERWRITE);
-	fill_box(40, 72, 63, 127, OLED_ADDR_OVERWRITE);
-	draw_string_at(48, 6, str1, FONT8x8, OLED_ADDR_DISABLE);
-	draw_string_at(48, 80, str2, FONT8x8, OLED_ADDR_DISABLE);
+void ui_scores_init(uint16_t *run_scores, uint16_t *sim_scores) {
+	draw_string_at(0, 8, "Live", FONT8x8, OLED_ADDR_LAYER);
+	for (uint8_t i = 0; i < 5; i++) {
+		draw_num(i*8 + 8, 0, run_scores[i], 0, OLED_ADDR_LAYER);
+	}
+	draw_string_at(0, 71, "Sim", FONT8x8, OLED_ADDR_LAYER);
+	for (uint8_t i = 0; i < 5; i++) {
+		draw_num(i*8 + 8, 63, sim_scores[i], 0, OLED_ADDR_LAYER);
+	}
+	fill_box(52, 72, 63, 127, OLED_ADDR_LAYER);
+	draw_string_at(54, 80, "Wipe", FONT8x8, OLED_ADDR_DISABLE);
 }
 
-/* Trigger the given button, drawing a box at the edge */
-void ui_button_trigger(uint8_t button, uint8_t on) {
-	switch (button) {
-	case BUTTON_1:
-		draw_box(41, 1, 62, 54, 2, on ? OLED_ADDR_DISABLE : OLED_ADDR_LAYER);
-		break;
-	case BUTTON_2:
-		draw_box(41, 73, 62, 126, 2, on ? OLED_ADDR_DISABLE : OLED_ADDR_LAYER);
-		break;
+void ui_scores_button() {
+	if (wipe_state == 0) {
+		fill_box(52, 72, 63, 127, OLED_ADDR_LAYER);
+		draw_string_at(54, 80, "Sure?", FONT8x8, OLED_ADDR_DISABLE);
+		wipe_state++;
+	} else {
+		wipe_state = 0;
+		uint16_t run_scores[5] = {0, 0, 0, 0, 0};
+		uint16_t sim_scores[5] = {0, 0, 0, 0, 0};
+		wipe_scores();
+		wipe_buffer();
+		ui_scores_init(run_scores, sim_scores);
 	}
 }
 
@@ -83,7 +94,7 @@ uint8_t get_list_pos() {
 
 /* Draw a big number in the UI, for debug */
 void ui_draw_big_number(uint8_t num) {
-	draw_large_num(16, 90, num, OLED_ADDR_LAYER);
+	draw_num(16, 90, num, 1, OLED_ADDR_LAYER);
 }
 
 /* Draw a big racket to the left and right of the screen, shifting them based on button presses */
@@ -119,7 +130,7 @@ void ui_menu_tick(uint8_t frames) {
 
 /* Initialize the menu with a given list of menu entries of length len */
 void ui_menu_init(char **list, uint8_t len) {
-	ui_list_init(list, 2);
+	ui_list_init(list, len);
 	ui_draw_rackets(1, 1);
 }
 

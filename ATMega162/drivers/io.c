@@ -5,9 +5,9 @@
  *  Author: Ole Sivert
  */ 
 #include <avr/io.h>
-#include <stdlib.h>
 #include "io.h"
 #include "adc.h"
+#include "../compact_math.h"
 
 /* Returns the value of the given button */
 uint8_t get_button(uint8_t button) {
@@ -77,11 +77,11 @@ uint8_t read_controller_status(controller_input_t *buffer) {
 	
 	uint8_t slider_one = get_slider_value(SLIDER_1);
 	uint8_t slider_two = get_slider_value(SLIDER_2);
-	if (abs(buffer->slider_one_value - slider_one) > 5) {
+	if (abs_diff(buffer->slider_one_value, slider_one) > 5) {
 		changes = 1;
 		buffer->slider_one_value = slider_one;
 	}
-	if (abs(buffer->slider_two_value - slider_two) > 5) {
+	if (abs_diff(buffer->slider_two_value, slider_two) > 5) {
 		changes = 1;
 		buffer->slider_two_value = slider_two;
 	}

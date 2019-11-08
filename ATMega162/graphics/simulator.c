@@ -11,6 +11,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdfix-avrlibc.h>
+#include "../drivers/eeprom.h"
+#include "../compact_math.h"
 
 #define SIM_BALL_RAD 3
 #define SIM_ACTOR_BASE_HEIGHT 12
@@ -35,7 +37,7 @@ typedef struct simulatorState {
 	uint8_t reset_solenoid;
 	uint8_t mode;
 	uint8_t force;
-	uint8_t score;
+	uint16_t score;
 	uint8_t redraw_score;
 	unsigned short accum ball_spd_abs;
 } simulatorState;
@@ -93,8 +95,7 @@ void sim_trigger_solenoid() {
 		if (state.mode == SIM_MODE_SIMULATOR) {
 			if (sim_check_collision()) {
 				if (ball.yvel > 0) {
-					state.score++;
-					state.redraw_score = 1;
+					sim_set_score(state.score + 1);
 					state.ball_spd_abs += SIM_BALL_SPEED_ACC;
 				}
 				// Get new speed
@@ -110,8 +111,8 @@ void sim_trigger_solenoid() {
 
 /* Tick the ball, updating position and calculating whether to bounce against a wall */
 void sim_update_ball(uint8_t frames) {
-	ball.xpos += ball.xvel * frames;
-	ball.ypos += ball.yvel * frames;
+	ball.xpos += long_accum_mult(ball.xvel, frames);
+	ball.ypos += long_accum_mult(ball.yvel, frames);
 	
 	int16_t sxpos = (int16_t)ball.xpos;
 	int16_t sypos = (int16_t)ball.ypos;
@@ -130,8 +131,8 @@ void sim_update_ball(uint8_t frames) {
 		ball.xvel = 0;
 		ball.yvel = SIM_BALL_SPEED_INIT;
 		state.ball_spd_abs = SIM_BALL_SPEED_INIT;
-		draw_large_num(10, 40, state.score, OLED_ADDR_DISABLE);
-		state.score = 0;
+		update_scores(SIM_MODE_SIMULATOR, state.score);
+		sim_set_score(0);
 		state.redraw_score = 1;
 		state.force = 1;
 	}
@@ -153,15 +154,6 @@ void sim_update_ball(uint8_t frames) {
 	if (ball.xpos > 40 && ball.xpos < 80 && ball.ypos > 10 && ball.ypos < 30) state.redraw_score = 1;
 }
 
-/* Draw the score, the number of times the ball has been successfully deflected */
-void sim_draw_score() {
-	if (!state.redraw_score) return;
-	if (state.score > 0) {
-		draw_large_num(10, 40, state.score - 1, OLED_ADDR_DISABLE);
-	}
-	draw_large_num(10, 40, state.score, OLED_ADDR_LAYER);
-}
-
 /* Simulator tick, count the solenoid reset, update the ball, re-draw the score, draw the angle if state.force is set */
 void sim_tick(uint8_t frames) {
 	if (state.triggered && (state.reset_solenoid += frames) >= 5) {
@@ -171,7 +163,9 @@ void sim_tick(uint8_t frames) {
 	}
 	if (state.mode == SIM_MODE_SIMULATOR) {
 		sim_update_ball(frames);
-		sim_draw_score();
+		if (state.redraw_score) {
+			sim_set_score(state.score);
+		}
 	}
 	if (state.force) {
 		sim_update_actor_angle(state.angle);
@@ -186,6 +180,15 @@ void sim_update_pos(uint8_t newpos) {
 	}
 }
 
+void sim_set_score(uint16_t score) {
+	if (score != state.score) {
+		draw_num(10, 40, state.score, 1, OLED_ADDR_DISABLE);
+	}
+	draw_num(10, 40, score, 1, OLED_ADDR_LAYER);
+	state.score = score;
+	state.redraw_score = 1;
+}
+
 /* Init the simulator in given mode, resets the state and the ball */
 void sim_init(uint8_t mode) {
 	state.last_angle = 0;
@@ -195,9 +198,9 @@ void sim_init(uint8_t mode) {
 	state.last_triggered = 0;
 	state.reset_solenoid = 0;
 	state.mode = mode;
-	state.score = 0;
 	state.redraw_score = 1;
 	sim_update_actor_angle(127);
+	sim_set_score(0);
 
 	if (mode == SIM_MODE_SIMULATOR) {
 		ball.xpos = 63;
