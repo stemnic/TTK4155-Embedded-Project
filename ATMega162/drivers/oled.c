@@ -44,8 +44,8 @@ void oled_init(){
 	oled_clear();
 }
 
-int currentPage = 0;
-int currentCol = 0;
+uint8_t currentPage = 0;
+uint8_t currentCol = 0;
 
 /* Write 0x00 to every byte of the screen, then reset the cursor */
 void oled_clear(){

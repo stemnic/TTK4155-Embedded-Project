@@ -20,8 +20,8 @@ void get_scores(uint8_t mode, uint16_t *buff) {
 void write_score(uint8_t mode, uint16_t *buff) {
 	uint8_t offset = mode == SIM_MODE_RUN ? 0 : 10;
 	for (int i = 0; i < 5; i++) {
-		eeprom_write_byte((uint8_t*)(i + offset), (uint8_t)buff[i]);
-		eeprom_write_byte((uint8_t*)(i + offset + 1), (uint8_t)(buff[i] >> 8));
+		eeprom_write_byte((uint8_t*)(i + offset), ((uint8_t)buff[i] & 0xFF));
+		eeprom_write_byte((uint8_t*)(i + offset + 1), (uint8_t)((buff[i] >> 8) & 0xFF));
 	}
 }
 

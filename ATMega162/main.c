@@ -60,7 +60,9 @@ ISR (TIMER0_OVF_vect) {
 
 int main(void) {
 	uart_init();
+	#ifdef DEBUG
 	fdevopen(uart_transmit_stdio, uart_receive_char);
+	#endif
 	//fdevopen(oled_write_char,uart_receive_char);
 	
 	// Fix PB3 to be an input for WR bodge on PCB
@@ -69,13 +71,21 @@ int main(void) {
 	SRAM_init();
 	//SRAM_test();
 	ADC_init();
-	//printf("ADC init\n");
+	#ifdef DEBUG
+	printf("ADC init\n");
+	#endif
 	oled_init();
-	//printf("OLED init\n");
+	#ifdef DEBUG
+	printf("OLED init\n");
+	#endif
 	spi_init();
-	//printf("SPI init\n");
+	#ifdef DEBUG
+	printf("SPI init\n");
+	#endif
 	can_init();
-	//printf("CAN init\n");
+	#ifdef DEBUG
+	printf("CAN init\n");
+	#endif
 	
 	wipe_buffer();
 	char * liststr[4] = { "Simulate", "Play", "High" };
@@ -231,7 +241,9 @@ int main(void) {
 					update_scores(SIM_MODE_RUN, score_timer);
 
 					score_timer = 0;
+					#ifdef DEBUG
 					printf("Game over!\n");
+					#endif
 				}
 			}
 		}

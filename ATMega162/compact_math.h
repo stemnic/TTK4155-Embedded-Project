@@ -14,6 +14,7 @@
 
 short accum accum_mult(short accum l, uint8_t r);
 accum long_accum_mult(accum l, int8_t r);
+
 uint8_t abs_diff(uint8_t lhs, uint8_t rhs);
 int16_t abs_diff_16(int16_t lhs, int16_t rhs);
 uint8_t num_len(uint16_t num);

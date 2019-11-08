@@ -108,9 +108,9 @@
   <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
   <avrgcc.compiler.symbols.DefSymbols>
     <ListValues>
-      <Value>DEBUG</Value>
       <Value>DEBUG_LOG</Value>
       <Value>F_CPU=4915200</Value>
+      <Value>DEBUG_SIM</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>

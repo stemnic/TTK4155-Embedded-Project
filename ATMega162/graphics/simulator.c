@@ -156,6 +156,7 @@ void sim_update_ball(uint8_t frames) {
 
 /* Simulator tick, count the solenoid reset, update the ball, re-draw the score, draw the angle if state.force is set */
 void sim_tick(uint8_t frames) {
+	#ifndef DEBUG
 	if (state.triggered && (state.reset_solenoid += frames) >= 5) {
 		state.triggered = 0;
 		state.reset_solenoid = 0;
@@ -170,6 +171,7 @@ void sim_tick(uint8_t frames) {
 	if (state.force) {
 		sim_update_actor_angle(state.angle);
 	}
+	#endif
 }
 
 /* Set a new position for the actor */
@@ -199,9 +201,10 @@ void sim_init(uint8_t mode) {
 	state.reset_solenoid = 0;
 	state.mode = mode;
 	state.redraw_score = 1;
+	#ifndef DEBUG
 	sim_update_actor_angle(127);
 	sim_set_score(0);
-
+	#endif
 	if (mode == SIM_MODE_SIMULATOR) {
 		ball.xpos = 63;
 		ball.ypos = 31;

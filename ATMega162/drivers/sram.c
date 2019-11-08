@@ -9,13 +9,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <avr/io.h>
-#include <util/delay.h>
 #include <avr/interrupt.h>
 #include "sram.h"
 
 /* Enable external memory, this is also required for memory-mapped IO */
 void SRAM_init() {
-	#ifdef DEBUG_LOG
+	#ifdef DEBUG
 	printf("Enabling EXTMEM\n");
 	#endif // _DEBUG_LOG
 
@@ -31,7 +30,7 @@ void SRAM_test(void) {
 	uint16_t ext_ram_size= 0x800;
 	uint16_t write_errors= 0;
 	uint16_t retrieval_errors= 0;
-	#ifdef DEBUG_LOG
+	#ifdef DEBUG
 	printf("Starting SRAM test...\n");
 	#endif // _DEBUG_LOG
 	// rand() stores some internal state, so calling this function in a loop will
@@ -44,7 +43,7 @@ void SRAM_test(void) {
 		ext_ram[i] = some_value;
 		uint8_t retreived_value = ext_ram[i];
 		if (retreived_value != some_value) {
-			#ifdef DEBUG_LOG
+			#ifdef DEBUG
 			printf("Write phase error: ext_ram[%4d] = %02X (should be %02X)\n", i, retreived_value, some_value);
 			#endif // _DEBUG_LOG
 			write_errors++;
@@ -58,7 +57,7 @@ void SRAM_test(void) {
 		uint8_t some_value = rand();
 		uint8_t retreived_value = ext_ram[i];
 		if (retreived_value != some_value) {
-			#ifdef DEBUG_LOG
+			#ifdef DEBUG
 			printf("Retrieval phase error: ext_ram[%4d] = %02X (should be %02X)\n", i, retreived_value, some_value);
 			#endif // _DEBUG_LOG
 			retrieval_errors++;
@@ -66,7 +65,7 @@ void SRAM_test(void) {
 			//printf("Correct retrieval match: ext_ram[%4d] = %02X\n", i, retreived_value);
 		}
 	}
-	#ifdef DEBUG_LOG
+	#ifdef DEBUG
 	printf("SRAM test completed with \n%4d errors in write phase and \n%4d errors in retrieval phase\n\n", write_errors, retrieval_errors);
 	#endif // _DEBUG_LOG
 }

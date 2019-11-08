@@ -118,6 +118,7 @@ void ui_draw_rackets(uint8_t left, uint8_t right) {
 /* Tick for the UI-menu, updates the ball graphic
 The ball follows a simple parabolic curve */
 void ui_menu_tick(uint8_t frames) {
+	#ifndef DEBUG
 	ballcnt = 0;
 	draw_circle(5+(ballx*ballx)/125, 63+ballx, 3, 1, OLED_ADDR_DISABLE);
 	ballx += dirball * frames * 2;
@@ -126,6 +127,7 @@ void ui_menu_tick(uint8_t frames) {
 	if (ballx <= -50) dirball = 1;
 	if (ballx < -30) ui_draw_rackets(1, 0);
 	if (ballx > 30) ui_draw_rackets(0, 1);
+	#endif
 }
 
 /* Initialize the menu with a given list of menu entries of length len */
@@ -153,10 +155,12 @@ void ui_menu_update(controller_input_t *_input) {
 
 /* Tick the simulator with given input and actor position */
 void ui_simulator_update(controller_input_t *_input, uint8_t pos) {
+	#ifndef DEBUG
 	controller_input_t input = *(_input);
 	sim_update_actor_angle(255 - input.slider_two_value);
 	if (input.joystick_button_changed && input.joystick_button) {
 		sim_trigger_solenoid();
 	}
 	sim_update_pos(pos / 2.8 + 20);
+	#endif
 }

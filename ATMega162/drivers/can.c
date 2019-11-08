@@ -63,7 +63,9 @@ void wait_for_trigger(uint8_t mask) {
 			if (errFlag & (0b111 << 5)) {
 				mcp_write(MCP_MODE_CMD, 0x2d, 0);
 			}
+			#ifdef DEBUG
 			printf("Error sending message: %i\n", errFlag);
+			#endif
 			return;
 		}
 	}
@@ -73,7 +75,6 @@ void wait_for_trigger(uint8_t mask) {
 uses 13 bytes (max length) on the stack rather than doing dynamic allocation */
 void can_send_data(can_msg_t *data) {
 	wait_for_trigger(7 << CAN_TX0);
-	//printf("Send data\n");
 	uint8_t buffNum;
 	uint8_t addr;
 	if (!(buffer_waiting & (1 << CAN_TX0))) {

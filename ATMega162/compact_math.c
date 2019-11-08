@@ -16,6 +16,7 @@ short accum accum_mult(short accum l, uint8_t r) {
 accum long_accum_mult(accum l, int8_t r) {
 	return l * r;
 }
+
 uint8_t abs_diff(uint8_t lhs, uint8_t rhs) {
 	return lhs > rhs ? lhs - rhs : rhs - lhs;
 }
