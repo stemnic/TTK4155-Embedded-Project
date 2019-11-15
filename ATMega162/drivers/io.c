@@ -63,7 +63,7 @@ uint8_t read_controller_status(controller_input_t *buffer) {
 	
 	int joystick_trigger = 0;
 	if (buffer->joystick_y > 40) joystick_trigger = 1;
-	if (buffer->joystick_y < -40) joystick_trigger = -1;
+	else if (buffer->joystick_y < -40) joystick_trigger = -1;
 	if (buffer->joystick_trigger_last != joystick_trigger && joystick_trigger != 0) {
 		changes = 1;
 		buffer->joystick_trigger = joystick_trigger;

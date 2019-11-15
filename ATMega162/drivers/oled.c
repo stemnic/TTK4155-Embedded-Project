@@ -9,11 +9,11 @@
 #include "oled.h"
 
 
-volatile char *oled_cmd = (char *) 0x1000;
-volatile char *oled_data = (char *) 0x1200;
+volatile char *oled_cmd = (char*)0x1000;
+volatile char *oled_data = (char*)0x1200;
 
 /* Execute given command on the oled controller */
-void oled_command(uint8_t command){
+void oled_command(uint8_t command) {
 	oled_cmd[0] = command;
 }
 
@@ -48,12 +48,11 @@ uint8_t currentPage = 0;
 uint8_t currentCol = 0;
 
 /* Write 0x00 to every byte of the screen, then reset the cursor */
-void oled_clear(){
+void oled_clear() {
 	for (int page = 0; page < 8; page++)
 	{
 		oled_command(PAGE_START_ADDR_PAGE_BASE + page);
-		for (int col = 0; col < 128; col++)
-		{
+		for (int col = 0; col < 128; col++) {
 			oled_data[0] = 0x00;
 		}
 	}

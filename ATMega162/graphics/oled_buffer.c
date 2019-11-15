@@ -11,7 +11,7 @@
 #include "geometry.h"
 #include "fonts.h"
 #include <stdio.h>
-volatile char* ext_ram = (char *) 0x1800;
+volatile char *ext_ram = (char*)0x1800;
 
 /* 1 if the contents of the buffer has been changed since last flush */
 uint8_t changed = 1;
@@ -76,15 +76,15 @@ void draw_data_at(uint8_t x, uint8_t y, uint8_t data, uint8_t len, uint8_t addre
 }
 /* Draw a character at the given position */
 void draw_char_at(uint8_t x, uint8_t y, char to_write, uint8_t font_size, uint8_t addressing_mode) {
-	for (int i=y; i < y + font_size; i++) {
+	for (int i = y; i < y + font_size; i++) {
 		draw_data_at(x, i, get_font_byte(to_write, i - y, font_size), 8, addressing_mode);
 	}
 }
 /* Draw a string of characters at the given position */
-void draw_string_at(uint8_t x, uint8_t y, char* str, uint8_t font_size, uint8_t addressing_mode) {
+void draw_string_at(uint8_t x, uint8_t y, char *str, uint8_t font_size, uint8_t addressing_mode) {
 	uint8_t i = 0;
 	for (i = 0; str[i] != '\0'; i++) {
-		draw_char_at(x, y + i*font_size, str[i], font_size, addressing_mode);
+		draw_char_at(x, y + i * font_size, str[i], font_size, addressing_mode);
 	}
 }
 
@@ -97,13 +97,13 @@ void draw_point_at(uint8_t x, uint8_t y, uint8_t addressingMode) {
 void draw_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressingMode) {
 	int16_t dx = abs_diff(x1, x0);
 	int16_t dy = -abs_diff(y1, y0);
-	int16_t err = dx+dy;
+	int16_t err = dx + dy;
 	int16_t sx = x0 < x1 ? 1 : -1;
 	int16_t sy = y0 < y1 ? 1 : -1;
 	while (1) {
 		draw_point_at(x0, y0, addressingMode);
 		if (x0 == x1 && y0 == y1) break;
-		int16_t e2 = err*2;
+		int16_t e2 = err * 2;
 		if (e2 >= dy) {
 			err += dy;
 			x0 += sx;
@@ -238,12 +238,12 @@ void draw_circle(uint8_t x0, uint8_t y0, uint8_t rad, uint8_t fill, uint8_t addr
 dimx, dimy must be the full dimensions of the image, as drawing only part creates issues, since each byte is flipped.
 If flip is 1, flip the image around the y-axis */
 void draw_image_at(uint8_t x0, uint8_t y0, uint8_t img, uint8_t flip, uint8_t dimx, uint8_t dimy, uint8_t addressing_mode) {
-	for (int i = 0; i < dimy/8; i++) {
+	for (int i = 0; i < dimy / 8; i++) {
 		for (int j = 0; j < dimx; j++) {
 			if (flip) {
-				draw_data_at(i*8 + y0, j + x0, get_img_byte(img, dimx - j - 1, dimy/8 - i - 1), 8, addressing_mode);
+				draw_data_at(i * 8 + y0, j + x0, get_img_byte(img, dimx - j - 1, dimy / 8 - i - 1), 8, addressing_mode);
 			} else {
-				draw_data_at(i*8 + y0, j + x0, get_img_byte(img, j, dimy/8 - i - 1), 8, addressing_mode);
+				draw_data_at(i * 8 + y0, j + x0, get_img_byte(img, j, dimy / 8 - i - 1), 8, addressing_mode);
 			}
 		}
 	}
@@ -252,9 +252,9 @@ void draw_image_at(uint8_t x0, uint8_t y0, uint8_t img, uint8_t flip, uint8_t di
 uint8_t get_font_byte(char in, uint8_t col, uint8_t font_size) {
 	switch (font_size) {
 		case FONT8x8:
-		return pgm_read_byte(&(font8[in - 32][col]));
+			return pgm_read_byte(&(font8[in - 32][col]));
 		default:
-		return 0;
+			return 0;
 	}
 }
 
@@ -262,9 +262,9 @@ uint8_t get_font_byte(char in, uint8_t col, uint8_t font_size) {
 uint16_t get_font_dword(uint8_t index, uint8_t col, uint8_t img) {
 	switch (img) {
 		case NUMBERS9x16:
-		return pgm_read_dword(&(font16[index][col]));
+			return pgm_read_dword(&(font16[index][col]));
 		default:
-		return 0;
+			return 0;
 	}
 }
 
@@ -272,8 +272,8 @@ uint16_t get_font_dword(uint8_t index, uint8_t col, uint8_t img) {
 uint8_t get_img_byte(uint8_t img, uint8_t row, uint8_t col) {
 	switch (img) {
 		case RACKET:
-		return pgm_read_byte(&(racket[row][col]));
+			return pgm_read_byte(&(racket[row][col]));
 		default:
-		return 0;
+			return 0;
 	}
 }

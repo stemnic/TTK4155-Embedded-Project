@@ -40,7 +40,7 @@ int8_t get_joystick_value(uint8_t value) {
 }
 
 /* Calculate the average value of the x and y positions of the joystick */
-void calibrate_joystick(){
+void calibrate_joystick() {
 	int xtotal = 0;
 	int ytotal = 0;
 	for (int i = 0; i < 100; i++) {
@@ -52,7 +52,7 @@ void calibrate_joystick(){
 	yMean = ytotal / 100;
 }
 
-void ADC_init(){
+void ADC_init() {
 	//Enables interrupt on falling flank on INT
 	MCUCR |= (ISC10 << 0);
 	//Enables INT0
@@ -74,7 +74,7 @@ uint8_t get_slider_value(uint8_t value) {
 
 /* Triggers on finished ADC conversion.
 Simply buffers the read value from memory-mapped IO and clears a flag */
-ISR (INT0_vect){
+ISR (INT0_vect) {
 	uint8_t adc_value = ext_adc[0];
 	waitingForADC = 0;
 	adcBuffer = adc_value;

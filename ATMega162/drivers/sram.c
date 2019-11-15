@@ -18,18 +18,18 @@ void SRAM_init() {
 	printf("Enabling EXTMEM\n");
 	#endif // _DEBUG_LOG
 
-	MCUCR |= (1<<SRE); //Enable EXTMEM
-	SFIOR |= (1<<XMM2);
+	MCUCR |= (1 << SRE); //Enable EXTMEM
+	SFIOR |= (1 << XMM2);
 	
 	//SFIOR |= (1<<XMBK); //Enable BusKeep
 }
 /* Test the consistency of sending/receiving data from external memory */
 void SRAM_test(void) {
-	volatile char *ext_ram = (char *) 0x1800; 
+	volatile char *ext_ram = (char*)0x1800; 
 	// Start address for the SRAM
-	uint16_t ext_ram_size= 0x800;
-	uint16_t write_errors= 0;
-	uint16_t retrieval_errors= 0;
+	uint16_t ext_ram_size = 0x800;
+	uint16_t write_errors = 0;
+	uint16_t retrieval_errors = 0;
 	#ifdef DEBUG
 	printf("Starting SRAM test...\n");
 	#endif // _DEBUG_LOG

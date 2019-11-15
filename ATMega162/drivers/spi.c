@@ -16,27 +16,27 @@
 #define DDRB_SCK 7
 
 /* Initialize the SPI on the ATMega, setting input/output, enabling master mode, and the clock rate to fck/16 */
-void spi_init(){
+void spi_init() {
 	/* Set MOSI, SS and SCK output, all others input */
-	DDRB |= (1<<DDRB_MOSI)|(1<<DDRB_SCK)|(1<<DDRB_SS);
+	DDRB |= (1 << DDRB_MOSI) | (1 << DDRB_SCK) | (1 << DDRB_SS);
 	/* Enable SPI, Master, set clock rate fck/16 */
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);//|(1<<SPIE);
+	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);//|(1<<SPIE);
 	//CPOL=1 and CPHA=1 for SPI mode 3, trying SPI mode 0 |(1<<CPOL)|(1<<CPHA)
 }
 
 /* Enable the slave, starting communication */
-void spi_start_communication(){
-	PORTB &= ~(1<<DDRB_SS);
+void spi_start_communication() {
+	PORTB &= ~(1 << DDRB_SS);
 }
 
 /* Disable the slave, ending communication */
-void spi_end_communication(){
-	PORTB |= (1<<DDRB_SS);
+void spi_end_communication() {
+	PORTB |= (1 << DDRB_SS);
 }
 
 /* Send and receive len bytes over SPI
 Works by spinning until the buffer is ready, then swapping data in the given array buff and the buffer register */
-void spi_send_data(uint8_t *buff, uint8_t len){
+void spi_send_data(uint8_t *buff, uint8_t len) {
 	/* Start transmission */
 	int current = 0;
 	SPDR = buff[0];

@@ -50,8 +50,8 @@ Slightly confusing as it only uses squared arithemtic, to avoid taking the squar
 uint8_t intersect_circle(uint8_t px, uint8_t py, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t rad) {
 	// Get the length of the projection onto the line
 	int16_t llen_sq = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0);
-	int16_t len_sq = (((y1 - y0)*px - (x1 - x0)*py + x1 * y0 - y1 * x0) * ((y1 - y0)*px - (x1 - x0)*py + x1 * y0 - y1 * x0)) / llen_sq;
-	if (len_sq > rad*rad) return 0; // Too far away for collision to be possible
+	int16_t len_sq = (((y1 - y0) * px - (x1 - x0) * py + x1 * y0 - y1 * x0) * ((y1 - y0)*px - (x1 - x0)*py + x1 * y0 - y1 * x0)) / llen_sq;
+	if (len_sq > rad * rad) return 0; // Too far away for collision to be possible
 	
 	// Get the squared distance to the two points
 	int16_t dist0 = (px - x0) * (px - x0) + (py - y0) * (py - y0);

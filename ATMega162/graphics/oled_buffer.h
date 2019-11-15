@@ -37,7 +37,7 @@ OLED_ADDR_INVERT: Invert the bits, using data as a mask */
 void draw_data_at(uint8_t x0, uint8_t y0, uint8_t data, uint8_t len, uint8_t addressing_mode);
 
 /* Draw a string of characters at the given position */
-void draw_string_at(uint8_t x0, uint8_t y0, char* str, uint8_t fontSize, uint8_t addressing_mode);
+void draw_string_at(uint8_t x0, uint8_t y0, char *str, uint8_t fontSize, uint8_t addressing_mode);
 /* Draw a 16x9 number, with any number of digits */
 void draw_num (uint8_t x0, uint8_t y0, uint16_t num, uint8_t large, uint8_t addressing_mode);
 /* Draw given image coded as an array of 8-bit values with top left corner at (x0, y0).

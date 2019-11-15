@@ -10,7 +10,7 @@
 #include "uart.h"
 
 #define F_CPU 4915200
-#define UBBR (F_CPU/16/BAUD-1)
+#define UBBR (F_CPU / 16 / BAUD - 1)
 
 /* Initialize the UART driver, setting baud rate and data format */
 void uart_init() {
@@ -18,16 +18,16 @@ void uart_init() {
 	UBRR0H = (uint8_t)(UBBR >> 8);
 	UBRR0L = (uint8_t)UBBR;
 	/* Enable receiver and transmitter and rx flag*/
-	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);
 	/* Set frame format: 8data, 1stop bit */
-	UCSR0C = (1<<URSEL0)|(3<<UCSZ00);
+	UCSR0C = (1 << URSEL0) | (3 << UCSZ00);
 	sei();
 }
 
 /* Send a character over UART */
 void uart_transmit(char data) {
-	while (!(UCSR0A & (1<<UDRE0))) {}	//waits for ready
-	UDR0=data;
+	while (!(UCSR0A & (1 << UDRE0))) {}	//waits for ready
+	UDR0 = data;
 }
 
 /* Send a character over UART, version used for STDIO */
@@ -38,7 +38,7 @@ int uart_transmit_stdio(char data, FILE* file){
 
 /* Send an array of characters over UART */
 void uart_print(const char string[]) {
-	for(uint16_t i=0; string[i]!='\0'; i++){
+	for(uint16_t i = 0; string[i] != '\0'; i++) {
 		uart_transmit(string[i]);
 	}
 }
