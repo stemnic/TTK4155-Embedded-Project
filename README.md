@@ -4,9 +4,9 @@
 ![mainmenu](mainmenu.gif)
 
 ## Extra features
-* Graphics library using double buffering through sram
+* Graphics library using double buffering through SRAM
 * PS2 Controller support as an alternative input for the game
-* Presistant High Score saved on the ATMega162 internal EEPROM
+* Presistent High Score saved on the ATMega162 internal EEPROM
 * Simple "Simulation mode"
 
 ## External Libraries
