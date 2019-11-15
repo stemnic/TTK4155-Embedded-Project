@@ -204,6 +204,7 @@ void sim_init(uint8_t mode) {
 	state.last_triggered = 0;
 	state.reset_solenoid = 0;
 	state.mode = mode;
+	state.score = 0;
 	state.redraw_score = 1;
 	#ifndef DEBUG
 	sim_update_actor_angle(127);

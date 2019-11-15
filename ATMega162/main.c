@@ -24,6 +24,14 @@
 #include "compact_math.h"
 #include <stdfix.h>
 
+#define CAN_MSG_GAMEOVER 2
+#define CAN_MSG_DATA 1
+#define CAN_MSG_PS2DATA 3
+#define CAN_MSG_MODE_RUN 4
+#define CAN_MSG_MODE_PS2 5
+#define CAN_MSG_MODE_NONE 6
+#define MAIN_MENU_LIST_LEN 4
+
 
 #define MOTOR_SPD_SCALE 15
 #define MOTOR_SPD_SCALE_INV 0.067K
@@ -102,25 +110,29 @@ int main(void) {
 	#endif
 	
 	wipe_buffer();
-	char * liststr[4] = { "Simulate", "Play", "High" };
+	char * liststr[MAIN_MENU_LIST_LEN] = { "Simulate", "Play", "High", "PS2" };
 
-	ui_menu_init(liststr, 3);
+	ui_menu_init(liststr, MAIN_MENU_LIST_LEN);
 	
 	process_cycle_clock_init();
 	
 	can_set_device_mode(CAN_MODE_NORMAL);
 	
 	controller_input_t input;
+	controller_input_t extInput;
+
+	can_msg_t mode_msg;
 
 	uint8_t data[6];
 	can_msg_t msg;
-	msg.id = 1;
+	msg.id = CAN_MSG_DATA;
 	msg.data = data;
 	msg.dataLen = 6;
 	
+	uint8_t extData[3];
 	can_msg_t recmsg;
-	recmsg.id = 2;
-	recmsg.data = NULL;
+	recmsg.data = extData;
+	recmsg.dataLen = 3;
 	
 	uint8_t ui_menu = UI_MENU_MAIN;
 
@@ -146,11 +158,18 @@ int main(void) {
 					ui_menu_tick(frames);
 					if (changes) ui_menu_update(&input);
 					if (input.joystick_button_changed && input.joystick_button) {
+						mode_msg.id = CAN_MSG_MODE_NONE;
 						uint8_t next = get_list_pos();
-						if (next == UI_MENU_SIM || next == UI_MENU_RUN) {
+						if (next == UI_MENU_SIM || next == UI_MENU_RUN || next == UI_MENU_CTRL) {
+							score_timer = 0;
 							ui_menu = next;
 							wipe_buffer();
 							sim_init(next == UI_MENU_SIM ? SIM_MODE_SIMULATOR : SIM_MODE_RUN);
+							if (next == UI_MENU_RUN) {
+								mode_msg.id = CAN_MSG_MODE_RUN;
+							} else if (next == UI_MENU_CTRL) {
+								mode_msg.id = CAN_MSG_MODE_PS2;
+							}
 						} else if (next == UI_MENU_HIGH) {
 							ui_menu = UI_MENU_HIGH;
 							uint16_t sim_scores[5];
@@ -160,13 +179,14 @@ int main(void) {
 							get_scores(SIM_MODE_SIMULATOR, sim_scores);
 							ui_scores_init(run_scores, sim_scores);
 						}
+						can_send_data(&mode_msg);
 					}
 					break;
 				case UI_MENU_SIM:
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
-						ui_menu_init(liststr, 3);
+						ui_menu_init(liststr, MAIN_MENU_LIST_LEN);
 						game_over = 0;
 						break;
 					}
@@ -194,7 +214,7 @@ int main(void) {
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
-						ui_menu_init(liststr, 3);
+						ui_menu_init(liststr, MAIN_MENU_LIST_LEN);
 						data[0] = 0;
 						data[1] = 127;
 						data[2] = 0;
@@ -203,6 +223,8 @@ int main(void) {
 						data[5] = 0;
 						can_send_data(&msg);
 						game_over = 0;
+						mode_msg.id = CAN_MSG_MODE_NONE;
+						can_send_data(&mode_msg);
 						break;
 					}
 					if (game_over) {
@@ -243,17 +265,42 @@ int main(void) {
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
-						ui_menu_init(liststr, 3);
+						ui_menu_init(liststr, MAIN_MENU_LIST_LEN);
 						break;
 					}
 					if (input.button_two_changed && input.button_two_value) {
 						ui_scores_button();
 					}
+				case UI_MENU_CTRL:
+					if (input.button_one_changed && input.button_one_value) {
+						ui_menu = UI_MENU_MAIN;
+						wipe_buffer();
+						ui_menu_init(liststr, MAIN_MENU_LIST_LEN);
+						mode_msg.id = CAN_MSG_MODE_NONE;
+						can_send_data(&mode_msg);
+						break;
+					}
+					if (game_over) {
+						game_over_countdown(&game_over);
+						break;
+					}
+					sim_tick(frames);
+					ui_simulator_update(&extInput, (uint8_t)motor_pos);
+					if (!scoring_enabled && extInput.joystick_button) {
+						scoring_enabled = 1;
+					}
+					if (scoring_enabled) {
+						if ((score_counter += frames) >= 60) {
+							score_timer++;
+							score_counter = 0;
+							sim_set_score(score_timer);
+						}
+					}
 			}
 
 
-			if (can_try_receive(&recmsg)) {
-				if (recmsg.id == 2 && ui_menu == UI_MENU_RUN && !game_over) {
+			while (can_try_receive(&recmsg)) {
+				if (recmsg.id == CAN_MSG_GAMEOVER && (ui_menu == UI_MENU_RUN || ui_menu == UI_MENU_CTRL) && !game_over) {
 					draw_num(10, 40, 3, 1, OLED_ADDR_LAYER);
 					motor_pos = 127;
 					ui_simulator_update(&input, 127);
@@ -270,6 +317,11 @@ int main(void) {
 					#ifdef DEBUG
 					printf("Game over!\n");
 					#endif
+				} else if (recmsg.id == CAN_MSG_PS2DATA && ui_menu == UI_MENU_CTRL) {
+					extInput.joystick_button = recmsg.data[2];
+					extInput.joystick_button_changed = recmsg.data[2];
+					extInput.slider_two_value = recmsg.data[1];
+					motor_pos = recmsg.data[0];
 				}
 			}
 		}

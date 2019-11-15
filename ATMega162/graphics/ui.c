@@ -52,6 +52,7 @@ void ui_list_init(char** options, uint8_t len) {
 }
 
 void ui_scores_init(uint16_t *run_scores, uint16_t *sim_scores) {
+	wipe_state = 0;
 	draw_string_at(0, 8, "Live", FONT8x8, OLED_ADDR_LAYER);
 	for (uint8_t i = 0; i < 5; i++) {
 		draw_num(i*8 + 8, 0, run_scores[i], 0, OLED_ADDR_LAYER);
