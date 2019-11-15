@@ -31,19 +31,19 @@ uint8_t wipe_state = 0;
 /* Select the element of the main-menu list at given index
 Simply inverts the line, which gives a clear impression of index */
 void ui_list_select(uint8_t row) {
-	for (int j = 0; j < lengths[row]*8 + 4; j++) {
-		draw_data_at(row * 8 + 32, 63 - lengths[row]*4 - 2 + j, 0xFF, 1, OLED_ADDR_INVERT);
+	for (int j = 0; j < lengths[row] * 8 + 4; j++) {
+		draw_data_at(row * 8 + 32, 63 - lengths[row] * 4 - 2 + j, 0xFF, 1, OLED_ADDR_INVERT);
 	}
 }
 
 /* Init the ui-list with a given list of strings, with length len */
-void ui_list_init(char** options, uint8_t len) {
+void ui_list_init(char **options, uint8_t len) {
 	lengths = malloc(len);
 	for (uint8_t i = 0; i < len; i++) {
 		uint8_t len = 0;
 		while (options[i][len] != '\0') len++;
 		lengths[i] = len;
-		draw_string_at(i*8 + 32, 63-len*4, options[i], FONT8x8, OLED_ADDR_LAYER);
+		draw_string_at(i * 8 + 32, 63-len * 4, options[i], FONT8x8, OLED_ADDR_LAYER);
 	}
 
 	listLen = len;
@@ -55,11 +55,11 @@ void ui_scores_init(uint16_t *run_scores, uint16_t *sim_scores) {
 	wipe_state = 0;
 	draw_string_at(0, 8, "Live", FONT8x8, OLED_ADDR_LAYER);
 	for (uint8_t i = 0; i < 5; i++) {
-		draw_num(i*8 + 8, 0, run_scores[i], 0, OLED_ADDR_LAYER);
+		draw_num(i * 8 + 8, 0, run_scores[i], 0, OLED_ADDR_LAYER);
 	}
 	draw_string_at(0, 71, "Sim", FONT8x8, OLED_ADDR_LAYER);
 	for (uint8_t i = 0; i < 5; i++) {
-		draw_num(i*8 + 8, 63, sim_scores[i], 0, OLED_ADDR_LAYER);
+		draw_num(i * 8 + 8, 63, sim_scores[i], 0, OLED_ADDR_LAYER);
 	}
 	fill_box(52, 72, 63, 127, OLED_ADDR_LAYER);
 	draw_string_at(54, 80, "Wipe", FONT8x8, OLED_ADDR_DISABLE);
@@ -121,9 +121,9 @@ The ball follows a simple parabolic curve */
 void ui_menu_tick(uint8_t frames) {
 	#ifndef DEBUG
 	ballcnt = 0;
-	draw_circle(5+(ballx*ballx)/125, 63+ballx, 3, 1, OLED_ADDR_DISABLE);
+	draw_circle(5 + (ballx * ballx) / 125, 63 + ballx, 3, 1, OLED_ADDR_DISABLE);
 	ballx += dirball * frames * 2;
-	draw_circle(5+(ballx*ballx)/125, 63+ballx, 3, 1, OLED_ADDR_LAYER);
+	draw_circle(5 + (ballx * ballx) / 125, 63 + ballx, 3, 1, OLED_ADDR_LAYER);
 	if (ballx >= 50) dirball = -1;
 	if (ballx <= -50) dirball = 1;
 	if (ballx < -30) ui_draw_rackets(1, 0);

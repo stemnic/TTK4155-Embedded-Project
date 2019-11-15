@@ -24,7 +24,7 @@ bouncing ball between */
 /* Select the element of the main-menu list at given index */
 void ui_list_select(uint8_t row);
 /* Init the ui-list with a given list of strings, with length len */
-void ui_list_init(char** options, uint8_t len);
+void ui_list_init(char **options, uint8_t len);
 /* Update the list with the given value of joystick_trigger, 1 to increment selection, -1 to decrement */
 void ui_list_update(int8_t joystick_trigger);
 /* Return the current selected list index */

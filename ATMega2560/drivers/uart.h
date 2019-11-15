@@ -16,7 +16,7 @@ void uart_init();
 void uart_transmit(char data);
 
 /* Send a character over UART, version used for STDIO */
-int uart_transmit_stdio(char data, FILE* file);
+int uart_transmit_stdio(char data, FILE *file);
 
 /* Transmit a null-terminated string over uart, busy-waiting until sent. */
 void uart_print(const char string[]);

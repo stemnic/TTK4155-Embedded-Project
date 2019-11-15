@@ -31,7 +31,7 @@ Finally it clears the interrupt flags to properly reset the device. */
 void can_init() {
 	// Enable interrupts on any transmit buffer empty, or receive buffer full, as well as error during rec/transmission
 	can_set_device_mode(CAN_MODE_CONFIGURATION);
-	mcp_write(MCP_MODE_CMD, CANINTE, (1 << CAN_RX0)|(1 << CAN_RX1)|(1 << CAN_TX0)|(1 << CAN_TX1)|(1 << CAN_TX2)|(1 << CAN_ERR));
+	mcp_write(MCP_MODE_CMD, CANINTE, (1 << CAN_RX0) | (1 << CAN_RX1) | (1 << CAN_TX0) | (1 << CAN_TX1) | (1 << CAN_TX2) | (1 << CAN_ERR));
 	// Enable interrupt 1 on falling edge
 	
 	//EIMSK |= (1<<INT2);

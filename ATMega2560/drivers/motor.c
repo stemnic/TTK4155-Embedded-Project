@@ -52,7 +52,7 @@ void motor_calibrate(){
 }
 
 /* Initialize the motor, enabling output on correct pins, and enabling the motor itself */
-void motor_init(){
+void motor_init() {
 	TWI_Master_Initialise();
 	sei();
 	
@@ -84,26 +84,19 @@ uint16_t motor_encoder_value() {
 	
 	// Is the value somehow out of range?
     if ((motor_left_point > motor_right_point && (value > motor_left_point || value < motor_right_point))
-		|| (motor_left_point < motor_right_point && (value < motor_right_point && value > motor_left_point)))
-    {
+		|| (motor_left_point < motor_right_point && (value < motor_right_point && value > motor_left_point))) {
 	    // Value is out of range on the right side
 	    if (value > motor_left_point + motor_range
-			|| (value < motor_right_point && (motor_right_point < motor_range || value > motor_right_point - motor_range)))
-	    {
+			|| (value < motor_right_point && (motor_right_point < motor_range || value > motor_right_point - motor_range))) {
 		    motor_right_point = value;
 		    motor_left_point = ((motor_right_point + motor_range) % (1 << 15));
 		    // Else out of range on the left side
-	    }
-	    else
-	    {
+	    } else {
 		    // Safe subtraction, to make sure the value wraps around to 32k.
 		    motor_left_point = value;
-		    if (motor_left_point >= motor_range)
-		    {
+		    if (motor_left_point >= motor_range) {
 			    motor_right_point = (motor_left_point - motor_range);
-		    }
-		    else
-		    {
+		    } else {
 			    motor_right_point = (1 << 15) - motor_range + motor_left_point;
 		    }
 	    }
@@ -131,7 +124,7 @@ void motor_direction(uint8_t dir) {
 
 /* Set the motor value directly */
 void motor_value(uint8_t value) {
-	unsigned char message[3] = { MOTOR_ADC_WRITE, 0, 0};
+	unsigned char message[3] = {MOTOR_ADC_WRITE, 0, 0};
 	if (value > 120) {
 		value = 120;
 	}
@@ -158,7 +151,7 @@ void motor_set_value(int8_t value) {
 
 /* Set the target pos of the regulator */
 void motor_set_target_pos(uint8_t _pos) {
-	target_pos = ((int16_t)_pos)*motor_scale;
+	target_pos = ((int16_t)_pos) * motor_scale;
 	//printf("New target pos: %i\n", target_pos);
 }
 
@@ -168,7 +161,7 @@ void motor_regulator_tick() {
 	//printf("Current pos: %i, target pos: %i\n", pos, target_pos);
 	int16_t error = -(target_pos - pos);
 	acc += K * error;
-	int16_t regraw = (int16_t)(K*KP * (float)error) + (int16_t)(KI * (float)acc) + (int16_t)(K*KD * (float)(error - last_error)*60);
+	int16_t regraw = (int16_t)(K * KP * (float)error) + (int16_t)(KI * (float)acc) + (int16_t)(K * KD * (float)(error - last_error) * 60);
 	//printf("raw reg: %i, error: %i\n", regraw, error);
 	int8_t regval = 0;
 	if (regraw > 127) {

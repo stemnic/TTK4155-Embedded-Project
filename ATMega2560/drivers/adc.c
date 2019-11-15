@@ -20,6 +20,7 @@ void adc_init() {
 	| (0 << ADATE)     /* Auto Trigger: disabled */
 	| (0 << ADIE)      /* ADC Interrupt: disabled */
 	| (0b111 << ADPS0); /* 2 */
+	
 	ADCSRB = (0x00 << ADTS0)    /* Free Running mode */
 	| (0 << ACME)      /* Analog Comparator Multiplexer: disabled */
 	| (0 << MUX5);
