@@ -38,6 +38,7 @@ void flush_buffer() {
 			oled_write_byte(val);
 		}
 	}
+	changed = 0;
 }
 
 /* Write a byte of data up to len (the lowest len bits), using the given addressing mode
