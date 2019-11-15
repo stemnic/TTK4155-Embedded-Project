@@ -281,6 +281,7 @@ int main(void) {
 					if (input.button_two_changed && input.button_two_value) {
 						ui_scores_button();
 					}
+					break;
 				case UI_MENU_PS2:
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;

@@ -183,6 +183,7 @@ int main(void) {
 					//printf("\n\n");
 				}
 				spi_switch_mode(0);
+				/* Trigger solenoid on all the trigger buttons, use left joystick for motor and right joystick for the servo */
 				uint16_t l_trigger = (buttons & (1 << 8));
 				uint16_t r_trigger = (buttons & (1 << 9));
 				uint16_t l_trigger_2 = (buttons & (1 << 10));
