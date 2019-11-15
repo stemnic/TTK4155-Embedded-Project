@@ -30,7 +30,7 @@ void mcp_read_array(uint8_t mode, uint8_t addr, uint8_t *arr, uint8_t len) {
 		buff[0] = 0x03;
 		buff[1] = addr;
 		spi_send_data(buff, len + 2);
-		for (int i = 0; i < len; i++) {
+		for (uint8_t i = 0; i < len; i++) {
 			arr[i] = buff[i+2];
 		}
 		free(buff);
@@ -39,7 +39,7 @@ void mcp_read_array(uint8_t mode, uint8_t addr, uint8_t *arr, uint8_t len) {
 	uint8_t *buff = malloc(len + 1);
 	buff[0] = 0x90 | addr << 1;
 	spi_send_data(buff, len + 1);
-	for (int i = 0; i < len; i++) {
+	for (uint8_t i = 0; i < len; i++) {
 		arr[i] = buff[i+1];
 	}
 	free(buff);
@@ -77,7 +77,7 @@ Dynamically allocates extra memory to fit the address and command, used in the l
 void mcp_write_array(uint8_t mode, uint8_t addr, uint8_t *arr, uint8_t len) {
 	if (mode == MCP_MODE_CMD) {
 		uint8_t *buff = malloc(len + 2);
-		for (int i = 0; i < len; i++) {
+		for (uint8_t i = 0; i < len; i++) {
 			buff[i + 2] = arr[i];
 		}
 		buff[0] = 0x02;
@@ -87,7 +87,7 @@ void mcp_write_array(uint8_t mode, uint8_t addr, uint8_t *arr, uint8_t len) {
 		return;
 	}
 	uint8_t *buff = malloc(len + 1);
-	for (int i = 0; i < len; i++) {
+	for (uint8_t i = 0; i < len; i++) {
 		buff[i + 1] = arr[i];
 	}
 	buff[0] = 0x40 | addr;

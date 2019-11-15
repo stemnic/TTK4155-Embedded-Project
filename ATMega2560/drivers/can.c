@@ -95,7 +95,7 @@ void can_send_data(can_msg_t *data) {
 	if (data->dataLen > 8) data->dataLen = 8;
 	raw[4] = data->dataLen & 0x0F;
 	// data
-	for (int i = 0; i < data->dataLen; i++) {
+	for (uint8_t i = 0; i < data->dataLen; i++) {
 		raw[i+5] = data->data[i];
 	}
 	mcp_write_array(MCP_MODE_CAN, addr, raw, data->dataLen + 5);
@@ -133,7 +133,7 @@ uint8_t can_receive_data(can_msg_t *data, uint8_t block) {
 	buffer_waiting |= 1 << buffNum;
 	
 	data->id = ((uint16_t)raw[0]) << 3 | ((uint16_t)raw[1]) >> 5;
-	for (int i = 0; i < data->dataLen; i++) {
+	for (uint8_t i = 0; i < data->dataLen; i++) {
 		data->data[i] = raw[i+5];
 	}
 	return 1;

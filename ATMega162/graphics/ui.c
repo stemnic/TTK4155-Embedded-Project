@@ -31,7 +31,7 @@ uint8_t wipe_state = 0;
 /* Select the element of the main-menu list at given index
 Simply inverts the line, which gives a clear impression of index */
 void ui_list_select(uint8_t row) {
-	for (int j = 0; j < lengths[row] * 8 + 4; j++) {
+	for (uint8_t j = 0; j < lengths[row] * 8 + 4; j++) {
 		draw_data_at(row * 8 + 32, 63 - lengths[row] * 4 - 2 + j, 0xFF, 1, OLED_ADDR_INVERT);
 	}
 }

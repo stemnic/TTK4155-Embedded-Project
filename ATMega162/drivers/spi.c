@@ -38,7 +38,7 @@ void spi_end_communication() {
 Works by spinning until the buffer is ready, then swapping data in the given array buff and the buffer register */
 void spi_send_data(uint8_t *buff, uint8_t len) {
 	/* Start transmission */
-	int current = 0;
+	uint8_t current = 0;
 	SPDR = buff[0];
 	
 	spi_start_communication();

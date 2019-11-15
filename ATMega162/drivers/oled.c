@@ -49,10 +49,10 @@ uint8_t currentCol = 0;
 
 /* Write 0x00 to every byte of the screen, then reset the cursor */
 void oled_clear() {
-	for (int page = 0; page < 8; page++)
+	for (uint8_t page = 0; page < 8; page++)
 	{
 		oled_command(PAGE_START_ADDR_PAGE_BASE + page);
-		for (int col = 0; col < 128; col++) {
+		for (uint8_t col = 0; col < 128; col++) {
 			oled_data[0] = 0x00;
 		}
 	}

@@ -41,11 +41,11 @@ int8_t get_joystick_value(uint8_t value) {
 
 /* Calculate the average value of the x and y positions of the joystick */
 void calibrate_joystick() {
-	int xtotal = 0;
-	int ytotal = 0;
-	for (int i = 0; i < 100; i++) {
-		xtotal += (uint8_t)get_joystick_value_internal(JOYSTICK_X, 1);
-		ytotal += (uint8_t)get_joystick_value_internal(JOYSTICK_Y, 1);
+	int16_t xtotal = 0;
+	int16_t ytotal = 0;
+	for (uint8_t i = 0; i < 100; i++) {
+		xtotal += get_joystick_value_internal(JOYSTICK_X, 1);
+		ytotal += get_joystick_value_internal(JOYSTICK_Y, 1);
 	}
 
 	xMean = xtotal / 100;

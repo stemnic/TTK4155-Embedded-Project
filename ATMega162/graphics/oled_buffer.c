@@ -19,8 +19,8 @@ uint8_t changed = 1;
 /* Wipe the SRAM buffer */
 void wipe_buffer() {
 	changed = 1;
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 128; j++) {
+	for (uint8_t i = 0; i < 8; i++) {
+		for (uint8_t j = 0; j < 128; j++) {
 			ext_ram[((i << 7) + j) << 1] = 0x00;
 		}
 	}
@@ -76,14 +76,13 @@ void draw_data_at(uint8_t x, uint8_t y, uint8_t data, uint8_t len, uint8_t addre
 }
 /* Draw a character at the given position */
 void draw_char_at(uint8_t x, uint8_t y, char to_write, uint8_t font_size, uint8_t addressing_mode) {
-	for (int i = y; i < y + font_size; i++) {
+	for (uint8_t i = y; i < y + font_size; i++) {
 		draw_data_at(x, i, get_font_byte(to_write, i - y, font_size), 8, addressing_mode);
 	}
 }
 /* Draw a string of characters at the given position */
 void draw_string_at(uint8_t x, uint8_t y, char *str, uint8_t font_size, uint8_t addressing_mode) {
-	uint8_t i = 0;
-	for (i = 0; str[i] != '\0'; i++) {
+	for (uint8_t i = 0; str[i] != '\0'; i++) {
 		draw_char_at(x, y + i * font_size, str[i], font_size, addressing_mode);
 	}
 }
@@ -140,7 +139,7 @@ void fill_box(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t addressing
 	uint8_t x = x0;
 	while (dx > 0) {
 		uint8_t len = dx < 8 ? dx : 8;
-		for (int y = y0; y <= y1; y += sy) {
+		for (uint8_t y = y0; y <= y1; y += sy) {
 			draw_data_at(x, y, 0xFF, len, addressingMode);
 		}
 		dx -= len;
@@ -170,7 +169,7 @@ void draw_num (uint8_t x0, uint8_t y0, uint16_t num, uint8_t large, uint8_t addr
 	do {
 		uint8_t digit = num % 10;
 		if (large) {
-			for (int i = 0; i < 9; i++) {
+			for (uint8_t i = 0; i < 9; i++) {
 				uint16_t val = get_font_dword(digit, i, NUMBERS9x16);
 				draw_data_at(x0, (y0 + i) + 9 * (len - cnt), val & 0xFF, 8, addressing_mode);
 				draw_data_at(x0 + 8, (y0 + i) + 9 * (len - cnt), (val & 0xFF00) >> 8, 8, addressing_mode);
@@ -238,8 +237,8 @@ void draw_circle(uint8_t x0, uint8_t y0, uint8_t rad, uint8_t fill, uint8_t addr
 dimx, dimy must be the full dimensions of the image, as drawing only part creates issues, since each byte is flipped.
 If flip is 1, flip the image around the y-axis */
 void draw_image_at(uint8_t x0, uint8_t y0, uint8_t img, uint8_t flip, uint8_t dimx, uint8_t dimy, uint8_t addressing_mode) {
-	for (int i = 0; i < dimy / 8; i++) {
-		for (int j = 0; j < dimx; j++) {
+	for (uint8_t i = 0; i < dimy / 8; i++) {
+		for (uint8_t j = 0; j < dimx; j++) {
 			if (flip) {
 				draw_data_at(i * 8 + y0, j + x0, get_img_byte(img, dimx - j - 1, dimy / 8 - i - 1), 8, addressing_mode);
 			} else {

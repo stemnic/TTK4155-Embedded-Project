@@ -35,7 +35,7 @@ void adc_start_conversion() {
 }
 
 /* Return true if conversion is done */
-int adc_is_conversion_done() {
+uint8_t adc_is_conversion_done() {
 	return (ADCSRA & (1 << ADIF));
 }
 
