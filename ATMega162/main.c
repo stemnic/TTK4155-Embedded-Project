@@ -36,6 +36,7 @@
 #define MOTOR_SPD_SCALE 15
 #define MOTOR_SPD_SCALE_INV 0.067K
 
+/* Enable 60Hz clock */
 void process_cycle_clock_init() {
 	TCCR0 |= (0b100 << 0); // clk/256 will interrupt at an interval of 13ms
 	TIMSK |= (1 << 1); // Overflow interrupt enable
@@ -43,7 +44,7 @@ void process_cycle_clock_init() {
 
 accum motor_pos = 127;
 
-
+/* Convert fixed point motor position to 8 bit integer value */
 uint8_t get_motor_pos(controller_input_t* input) {
 	uint8_t conv_motor_pos = 0;
 	motor_pos += long_accum_mult(MOTOR_SPD_SCALE_INV, input->joystick_x);
@@ -60,6 +61,7 @@ uint8_t get_motor_pos(controller_input_t* input) {
 	return conv_motor_pos;
 }
 
+/* Convenient code to handle countdown on game over */
 void game_over_countdown(uint8_t *game_over) {
 	(*game_over)++;
 	if (*game_over % 60 == 0) {
@@ -85,10 +87,9 @@ int main(void) {
 	#ifdef DEBUG
 	fdevopen(uart_transmit_stdio, uart_receive_char);
 	#endif
-	//fdevopen(oled_write_char,uart_receive_char);
 	
 	// Fix PB3 to be an input for WR bodge on PCB
-	DDRB &= ~(1 << PB3 );
+	DDRB &= ~(1 << PB3);
 	
 	SRAM_init();
 	//SRAM_test();
@@ -129,9 +130,9 @@ int main(void) {
 	msg.data = data;
 	msg.dataLen = 6;
 	
-	uint8_t extData[3];
+	uint8_t data_ext[3];
 	can_msg_t recmsg;
-	recmsg.data = extData;
+	recmsg.data = data_ext;
 	recmsg.dataLen = 3;
 	
 	uint8_t ui_menu = UI_MENU_MAIN;
@@ -149,25 +150,31 @@ int main(void) {
 
 	while (1) {
 		if (timer_int_tick) {
+			/* 60Hz is sometimes a bit too fast for the complex geometry calculations in the simulator,
+			so we store the number of elapsed frames and use that in some cases to keep things seeming smooth */
 			uint8_t frames = timer_int_tick;
 			timer_int_tick = 0;
 			flush_buffer();
 			changes = read_controller_status(&input);
+			/* Five modes: Main menu, high score list, run mode, ps2 run mode */
 			switch(ui_menu) {
 				case UI_MENU_MAIN:
 					ui_menu_tick(frames);
 					if (changes) ui_menu_update(&input);
+					/* Joystick button is used to change mode, the transitions to each state are here.
+					Mostly they are fairly simple, we send a message to the motor controller on mode change,
+					and make sure to initialize the simulator when necessary */
 					if (input.joystick_button_changed && input.joystick_button) {
 						mode_msg.id = CAN_MSG_MODE_NONE;
 						uint8_t next = get_list_pos();
-						if (next == UI_MENU_SIM || next == UI_MENU_RUN || next == UI_MENU_CTRL) {
+						if (next == UI_MENU_SIM || next == UI_MENU_RUN || next == UI_MENU_PS2) {
 							score_timer = 0;
 							ui_menu = next;
 							wipe_buffer();
 							sim_init(next == UI_MENU_SIM ? SIM_MODE_SIMULATOR : SIM_MODE_RUN);
 							if (next == UI_MENU_RUN) {
 								mode_msg.id = CAN_MSG_MODE_RUN;
-							} else if (next == UI_MENU_CTRL) {
+							} else if (next == UI_MENU_PS2) {
 								mode_msg.id = CAN_MSG_MODE_PS2;
 							}
 						} else if (next == UI_MENU_HIGH) {
@@ -183,6 +190,8 @@ int main(void) {
 					}
 					break;
 				case UI_MENU_SIM:
+					/* Left button triggers return to main menu, there is some mode-specific code
+					typically setting the motor controller into off-mode and initializing the menu */
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
@@ -190,6 +199,7 @@ int main(void) {
 						game_over = 0;
 						break;
 					}
+					/* game_over indicates if we are in game over mode, which involves a countdown from 3 and resetting motor positions */
 				    if (game_over) {
 						game_over_countdown(&game_over);
 						motor_pos = 127;
@@ -271,7 +281,7 @@ int main(void) {
 					if (input.button_two_changed && input.button_two_value) {
 						ui_scores_button();
 					}
-				case UI_MENU_CTRL:
+				case UI_MENU_PS2:
 					if (input.button_one_changed && input.button_one_value) {
 						ui_menu = UI_MENU_MAIN;
 						wipe_buffer();
@@ -298,9 +308,9 @@ int main(void) {
 					}
 			}
 
-
+			/* We have to receive messages here in order to avoid blocking up the can bus. */
 			while (can_try_receive(&recmsg)) {
-				if (recmsg.id == CAN_MSG_GAMEOVER && (ui_menu == UI_MENU_RUN || ui_menu == UI_MENU_CTRL) && !game_over) {
+				if (recmsg.id == CAN_MSG_GAMEOVER && (ui_menu == UI_MENU_RUN || ui_menu == UI_MENU_PS2) && !game_over) {
 					draw_num(10, 40, 3, 1, OLED_ADDR_LAYER);
 					motor_pos = 127;
 					ui_simulator_update(&input, 127);
@@ -317,7 +327,7 @@ int main(void) {
 					#ifdef DEBUG
 					printf("Game over!\n");
 					#endif
-				} else if (recmsg.id == CAN_MSG_PS2DATA && ui_menu == UI_MENU_CTRL) {
+				} else if (recmsg.id == CAN_MSG_PS2DATA && ui_menu == UI_MENU_PS2) {
 					extInput.joystick_button = recmsg.data[2];
 					extInput.joystick_button_changed = recmsg.data[2];
 					extInput.slider_two_value = recmsg.data[1];

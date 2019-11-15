@@ -57,10 +57,10 @@ uint8_t get_motor_pos(int8_t joystick_x) {
 	if (motor_pos > 255) {
 		motor_pos = 255;
 		conv_motor_pos = 255;
-		} else if (motor_pos < 0) {
+	} else if (motor_pos < 0) {
 		motor_pos = 0;
 		conv_motor_pos = 0;
-		} else {
+	} else {
 		conv_motor_pos = (uint8_t)motor_pos;
 	}
 	return conv_motor_pos;

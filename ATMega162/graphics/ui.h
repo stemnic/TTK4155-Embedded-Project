@@ -13,7 +13,7 @@
 #define UI_MENU_SIM 0
 #define UI_MENU_RUN 1
 #define UI_MENU_HIGH 2
-#define UI_MENU_CTRL 3
+#define UI_MENU_PS2 3
 
 #include "../drivers/io.h"
 
