@@ -66,14 +66,14 @@ uint8_t get_motor_pos(int8_t joystick_x) {
 	return conv_motor_pos;
 }
 
-void solenoid_init(){
+void solenoid_init() {
 	PORTL |= (1 << PL6);
 	DDRL |= (1 << PL6);
 }
 
 uint8_t solenoid_status = 0;
 
-void solenoid_fire(){
+void solenoid_fire() {
 	PORTL &= ~(1 << PL6);
 	solenoid_status = 0;
 }
@@ -96,7 +96,7 @@ void process_cycle_clock_init() {
 
 uint8_t timer_int_trigger = 0;
 
-ISR (TIMER0_OVF_vect){
+ISR (TIMER0_OVF_vect) {
 	timer_int_trigger = 1;
 }
 
@@ -157,7 +157,6 @@ int main(void) {
 		if (timer_int_trigger) {
 			uint8_t ir_trigger = (adc_get_ir_conversion() < 500);
 			if (ir_trigger != previous_ir_trigger) {
-				//printf ("ir trigger: %i\n", ir_trigger);
 				previous_ir_trigger = ir_trigger;
 				if (ir_trigger == 1 && (mode == GAME_MODE_NORMAL || mode == GAME_MODE_PS2)) {
 					can_send_data(&scoremsg);
@@ -238,12 +237,6 @@ int main(void) {
 				mode = GAME_MODE_PS2;
 			}
 		}
-		
-		//printf("ir trigger: %i\n", ir_trigger);
-		//printf("x: %i, y: %i, button: %i, slider: %i\n", (int8_t)message.data[0], (int8_t)message.data[1], message.data[2], (uint8_t)message.data[3]);
-		
-		// Example from library
-
 		_delay_us(1);
 	}
 }
